@@ -10,6 +10,6 @@
 2. MariaDB 기반 Spring Data JPA 서비스 구현
 
 * 환경 설정 : 자바 17
-* 주요 적용 프레임워크 : Spring Boot Frameworks, Spring Data JPA
+* 주요 적용 프레임워크 : Spring Boot Frameworks 3.x, Spring Data JPA
 
 * 학과 수업에 대한 궁금증은 학과 오픈채팅방에 문의 : https://open.kakao.com/o/gEd0JIad
