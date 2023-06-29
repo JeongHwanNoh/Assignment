@@ -35,7 +35,7 @@ public class NoticeService implements INoticeService {
 
         // 엔티티의 값들을 DTO에 맞게 넣어주기
         List<NoticeDTO> nList = new ObjectMapper().convertValue(rList,
-                new TypeReference<List<NoticeDTO>>() {
+                new TypeReference<>() {
                 });
 
         log.info(this.getClass().getName() + ".getNoticeList End!");
