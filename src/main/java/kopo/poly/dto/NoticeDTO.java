@@ -1,9 +1,7 @@
 package kopo.poly.dto;
 
 import lombok.Builder;
-import org.springframework.validation.annotation.Validated;
 
-@Validated
 @Builder
 public record NoticeDTO(
         
