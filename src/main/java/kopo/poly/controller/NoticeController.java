@@ -79,7 +79,7 @@ public class NoticeController {
      * GetMapping(value = "notice/noticeReg") =>  GET방식을 통해 접속되는 URL이 notice/noticeReg 경우 아래 함수를 실행함
      */
     @GetMapping(value = "noticeReg")
-    public String NoticeReg() {
+    public String noticeReg() {
 
         log.info(this.getClass().getName() + ".noticeReg Start!");
 
