@@ -12,9 +12,10 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Builder
-@Cacheable
 @Entity
-public class NoticeEntity {
+
+
+public class NoticeJoinEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,13 +38,16 @@ public class NoticeEntity {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
+    @NonNull
     @Column(name = "read_cnt", nullable = false)
     private Long readCnt;
 
-    @Column(name = "reg_id", updatable = false)
+    @NonNull
+    @Column(name = "reg_id", nullable = false)
     private String regId;
 
-    @Column(name = "reg_dt", updatable = false)
+    @NonNull
+    @Column(name = "reg_dt", nullable = false)
     private String regDt;
 
     @Column(name = "chg_id")
@@ -51,5 +55,11 @@ public class NoticeEntity {
 
     @Column(name = "chg_dt")
     private String chgDt;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private UserInfoEntity userInfoEntity;
+
+
 
 }

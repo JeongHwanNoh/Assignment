@@ -12,9 +12,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Builder
-@Cacheable
 @Entity
-public class NoticeEntity {
+@Cacheable
+public class NoticeFetchEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,4 +52,7 @@ public class NoticeEntity {
     @Column(name = "chg_dt")
     private String chgDt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private UserInfoEntity userInfo;
 }
