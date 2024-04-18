@@ -6,7 +6,6 @@ import lombok.Setter;
 
 @Builder
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Setter
 public record MailDTO (
 
     String toMail, // 받는 사람

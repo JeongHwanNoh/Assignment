@@ -10,7 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,12 +33,12 @@ public class MailService implements IMailService {
 
         //전달 받은 DTO로부터 데이터 가져오기(DTO객체가 메모리에 올라가지 않아 Null이 발생할 수 있기 때문에 에러방지차원으로 if문 사용함
         if (pDTO == null) {
-            pDTO = new MailDTO();
+            pDTO = new MailDTO(null, null, null);
         }
 
-        String toMail = CmmUtil.nvl(pDTO.getToMail()); // 받는사람
-        String title = CmmUtil.nvl(pDTO.getTitle()); // 메일제목
-        String contents = CmmUtil.nvl(pDTO.getContents()); // 메일제목
+        String toMail = CmmUtil.nvl(pDTO.toMail()); // 받는사람
+        String title = CmmUtil.nvl(pDTO.title()); // 메일제목
+        String contents = CmmUtil.nvl(pDTO.contents()); // 메일제목
 
         log.info("toMail : " + toMail);
         log.info("title : " + title);

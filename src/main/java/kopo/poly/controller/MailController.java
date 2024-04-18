@@ -65,8 +65,13 @@ public class MailController {
                 .contents(EncryptUtil.encAES128CBC(contents))
                 .build();
 
+//        MailDTO rDTO = Optional.ofNullable(mailService.doSendMail(pDTO))
+//                .orElseGet(() -> MailDTO.builder().build());
+
         MailDTO rDTO = Optional.ofNullable(mailService.doSendMail(pDTO))
+                .map(result -> MailDTO.builder().build())
                 .orElseGet(() -> MailDTO.builder().build());
+
 
         int res = mailService.doSendMail(pDTO);
 

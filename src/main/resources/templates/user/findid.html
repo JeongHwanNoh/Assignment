@@ -1,129 +1,72 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
-    <meta name="generator" content="Hugo 0.88.1">
-    <title>로그인</title>
-    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript">
-
-        // HTML로딩이 완료되고, 실행됨
-        $(document).ready(function () {
-
-            // 회원가입
-            $("#btnUserReg").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-                location.href = "/user/userRegForm";
-            })
-
-            // 메인화면
-            $("#btnMain").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-                location.href = "/html/index.html";
-            })
-
-            // 로그인 버튼 클릭 이벤트 처리
-            $("#btnLogin").on("click", function (event) {
-                event.preventDefault(); // 폼 제출 방지
-
-                let f = $("form"); // 폼 선택
-
-                if (f.find("#user_id").val() === "") {
-                    alert("아이디를 입력하세요.");
-                    f.find("#user_id").focus();
-                    return;
-                }
-
-                if (f.find("#password").val() === "") {
-                    alert("비밀번호를 입력하세요.");
-                    f.find("#password").focus();
-                    return;
-                }
-
-                // Ajax 호출해서 로그인하기
-                $.ajax({
-                    url: "/user/loginProc",
-                    type: "post",
-                    dataType: "JSON",
-                    data: f.serialize(), // 폼 직렬화하여 전송
-                    success: function (json) {
-                        if (json.result === 1) {
-                            alert(json.msg);
-                            location.href = "/main/index";
-                        } else {
-                            alert(json.msg);
-                            f.find("#user_id").focus();
-                        }
-                    }
-                });
-            });
-        });
-
-    </script>
-
-    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/sign-in/">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>아이디 찾기</title>
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!--<link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">-->
     <link href="/css/signin.css" rel="stylesheet"/>
-
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-    <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
-        }
-
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-
-        /* 스타일 추가 */
-        .form-floating i {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 0.5rem;
-            font-size: 1.5rem;
-            color: #6c757d; /* Font Awesome 아이콘 색상에 맞추세요 */
-        }
-    </style>
-
-    <!-- Custom styles for this template -->
-    <link href="/css/signin.css" rel="stylesheet">
 </head>
 <body class="text-center">
-
 <main class="form-signin">
     <form>
         <img class="mb-4" src="../assets/dist/book_icon.png" alt="" width="72" height="57">
         <h1 class="h3 mb-3 fw-normal">아이디 찾기</h1>
-
         <div class="form-floating">
-            <input type="email" class="form-control" name="email" id="email" placeholder="&#xf007; 이메일">
+            <input type="email" class="form-control" name="email" id="email" placeholder="이메일">
         </div>
         <div class="form-floating">
-            <input type="user_name" class="form-control" id="user_name" name="user_name" placeholder="&#xf023; 이름">
-        </div>
+            <div class="form-floating">
+                <input type="text" class="form-control" id="userName" name="userName" placeholder="이름">
+            </div>
 
+        </div>
         <div class="checkbox mb-3">
         </div>
-        <button id="btnSearch" class="w-100 btn btn-lg btn-primary" type="submit">아이디 찾기</button>
+        <button id="btnSearch" class="w-100 btn btn-lg btn-primary" type="button">아이디 찾기</button>
     </form>
     <div>
         <a href="/user/login">로그인</a>
         <a href="/user/passwordsearch">비밀번호 찾기</a>
     </div>
 </main>
+
+<!-- JavaScript 코드 -->
+<script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnSearch").on("click", function (event) {
+            event.preventDefault();
+            let email = $("#email").val();
+            let userName = $("#userName").val();
+            $.ajax({
+                url: "/user/searchUserIdProc",
+                type: "post",
+                dataType: "json",
+                data: {
+                    email: email,
+                    userName: userName
+                },
+                success: function (json) {
+                    if (json !== null && json !== undefined) {
+                        if (json.msg !== null && json.msg !== undefined) {
+                            alert(json.msg); // 서버에서 보낸 메시지 표시
+                        } else {
+                            alert("해당하는 사용자를 찾을 수 없습니다.");
+                        }
+                    } else {
+                        alert("서버로부터 응답을 받지 못했습니다.");
+                    }
+                },
+                error: function () {
+                    alert("서버 요청 중 오류가 발생했습니다.");
+                }
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

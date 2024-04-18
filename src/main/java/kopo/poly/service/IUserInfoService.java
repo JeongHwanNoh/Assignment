@@ -1,5 +1,6 @@
 package kopo.poly.service;
 
+import kopo.poly.dto.NoticeDTO;
 import kopo.poly.dto.UserInfoDTO;
 
 public interface IUserInfoService {
@@ -13,8 +14,14 @@ public interface IUserInfoService {
     int getUserLogin(UserInfoDTO pDTO) throws Exception;
 
     // 아이디, 비밀번호 찾기에 활용
-    UserInfoDTO searchUserIdOrPasswordProc(UserInfoDTO pDTO) throws Exception;
+    String searchUserIdProc(UserInfoDTO pDTO) throws Exception;
 
-    // 비밀번호 재설정
+    String searchPasswordProc(UserInfoDTO pDTO) throws Exception;
+
+
+    //     비밀번호 재설정
     void newPasswordProc(UserInfoDTO pDTO) throws Exception;
+
+    void updateUserInfo(UserInfoDTO pDTO) throws Exception;
+    void deleteUserInfo(UserInfoDTO pDTO) throws Exception;
 }

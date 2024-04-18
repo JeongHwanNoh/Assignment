@@ -24,8 +24,12 @@ public class UserInfoEntity implements Serializable {
     private String userId;
 
     @NonNull
-    @Column(name = "USER_NAME", length = 500, nullable = false)
+    @Column(name = "USER_NAME", length = 100, nullable = false)
     private String userName;
+
+    @NonNull
+    @Column(name = "NICK_NAME", length = 100, nullable = false)
+    private String nickName;
 
     @NonNull
     @Column(name = "PASSWORD", length = 100, nullable = false)
@@ -57,9 +61,9 @@ public class UserInfoEntity implements Serializable {
     @Column(name = "CHG_DT")
     private String chgDt;
 
-    @Column(name = "GENDER")
+    @Column(name = "GENDER", length = 100, nullable = false)
     private String gender;
 
-    @Column(name = "GENRE")
+    @Column(name = "GENRE", length = 100, nullable = false)
     private String genre;
 }
