@@ -117,7 +117,6 @@ public class UserInfoService implements IUserInfoService {
 
         String userId = CmmUtil.nvl(pDTO.userId());
         String userName = CmmUtil.nvl(pDTO.userName());
-        String nickName = CmmUtil.nvl(pDTO.nickName());
         String password = CmmUtil.nvl(pDTO.password());
         String email = CmmUtil.nvl(pDTO.email());
         String addr1 = CmmUtil.nvl(pDTO.addr1());
@@ -136,7 +135,6 @@ public class UserInfoService implements IUserInfoService {
                     .userId(userId).userName(userName)
                     .password(password)
                     .email(email)
-                    .nickName(nickName)
                     .addr1(addr1).addr2(addr2)
                     .regId(userId).regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                     .chgId(userId).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
@@ -250,9 +248,12 @@ public class UserInfoService implements IUserInfoService {
     @Override
     public void newPasswordProc(UserInfoDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + "newPasswordProc start!");
+        log.info(this.getClass().getName() + ".newPasswordProc start!");
 
         String userId = CmmUtil.nvl(pDTO.userId());
+
+        log.info("userId : " + userId);
+
 
         // 사용자 ID로 사용자 엔티티 조회
         Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
@@ -276,10 +277,13 @@ public class UserInfoService implements IUserInfoService {
 
             userInfoRepository.save(pEntity);
 
+            log.info("확인");
+
         }
 
-        log.info(this.getClass().getName() + "newPasswordProc End!");
+        log.info(this.getClass().getName() + ".newPasswordProc End!");
     }
+
 
     @Override
     public void updateUserInfo(UserInfoDTO pDTO) throws Exception {

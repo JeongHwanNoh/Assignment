@@ -168,6 +168,15 @@ public class UserInfoController {
         return "user/findId";
     }
 
+    @GetMapping(value = "newPassword")
+    public String newPassword() {
+        log.info(this.getClass().getName() + ".user/searchUserId Start!");
+
+        log.info(this.getClass().getName() + ".user/searchUserId End!");
+
+        return "user/newPassword";
+    }
+
 
     @ResponseBody
     @PostMapping(value = "searchUserIdProc")        // 아이디 찾기 함수
@@ -272,11 +281,15 @@ public class UserInfoController {
      */
 //    @PostMapping(value = "searchPasswordProc")
 //    public String searchPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
-//        log.info(this.getClass().getName() + ".user/searchPasswordProc Start!");
+//        log.info(this.getClass().getName() + ".searchPasswordProc Start!");
 //
 //        String userId = CmmUtil.nvl(request.getParameter("userId"));
 //        String email = CmmUtil.nvl(request.getParameter("email"));
 //        String userName = CmmUtil.nvl(request.getParameter("userName"));
+//
+//        log.info("userId: " + userId);
+//        log.info("email: " + email);
+//        log.info("userName: " + userName);
 //
 //        UserInfoDTO pDTO = UserInfoDTO.builder()
 //                .userId(userId)
@@ -284,18 +297,59 @@ public class UserInfoController {
 //                .email(EncryptUtil.encAES128CBC(email))
 //                .build();
 //
-//        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.(pDTO))
-//                .orElseGet(() -> UserInfoDTO.builder().build());
+//        String password = userInfoService.searchPasswordProc(pDTO);
 //
-//        model.addAttribute("rDTO", rDTO);
+//        log.info("Retrieved password: " + password);
 //
-//        session.setAttribute("NEW_PASSWORD", userId);
+//        if (password != null && !password.isEmpty()) {
+//            session.setAttribute("NEW_PASSWORD_USER_ID", userId);
+//            log.info("성공 : " + password);
 //
-//        log.info(this.getClass().getName() + ".user/searchPasswordProc End!");
-//
-//        return "user/newPassword";
-//
+//            return "user/newPassword"; // 사용자 정보를 보여주는 페이지로 이동
+//        } else {
+//            log.info("실패 : " + password);
+//            // 해당하는 사용자를 찾을 수 없을 때의 처리
+//            return "user/login"; // 사용자 찾기 페이지로 다시 이동
+//        }
 //    }
+
+    @ResponseBody
+    @PostMapping(value = "searchPasswordProc")
+    public MsgDTO searchPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
+        log.info(this.getClass().getName() + ".searchPasswordProc Start!");
+
+        String userId = CmmUtil.nvl(request.getParameter("userId"));
+        String email = CmmUtil.nvl(request.getParameter("email"));
+        String userName = CmmUtil.nvl(request.getParameter("userName"));
+
+        log.info("userId: " + userId);
+        log.info("email: " + email);
+        log.info("userName: " + userName);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userId(userId)
+                .userName(userName)
+                .email(EncryptUtil.encAES128CBC(email))
+                .build();
+
+        String password = userInfoService.searchPasswordProc(pDTO);
+
+        log.info("Retrieved password: " + password);
+
+        MsgDTO dto;
+        if (password != null && !password.isEmpty()) {
+            session.setAttribute("NEW_PASSWORD_USER_ID", userId); // 성공적으로 비밀번호를 찾은 경우 세션에 아이디 저장
+            dto = MsgDTO.builder().msg("success").build(); // 성공적으로 비밀번호를 찾은 경우
+        } else {
+            dto = MsgDTO.builder().msg("fail").build(); // 비밀번호를 찾지 못한 경우
+        }
+
+        log.info(this.getClass().getName() + ".searchPasswordProc End!");
+        return dto;
+    }
+
+
+
 
     /**
      * 비밀번호 찾기 로직 수행
@@ -304,46 +358,50 @@ public class UserInfoController {
      */
     @PostMapping(value = "newPasswordProc")
     public String newPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
-
         log.info(this.getClass().getName() + ".user/newPasswordProc Start!");
 
         String msg = ""; // 웹에 보여줄 메시지
 
-        String newPassword = CmmUtil.nvl((String) session.getAttribute("NEW_PASSWORD"));
-        String userId = CmmUtil.nvl(request.getParameter("userId"));
+        // 세션에서 userId 받아오기
+        String userId = (String) session.getAttribute("NEW_PASSWORD_USER_ID");
 
-        if (newPassword.length() > 0) { //정상 접근
-
-            String password = CmmUtil.nvl(request.getParameter("password")); // 신규 비밀번호
-
-            log.info("password : " + password);
-
-            UserInfoDTO pDTO = UserInfoDTO.builder()
-                    .userId(userId)
-                    .password(EncryptUtil.encHashSHA256(password))
-                    .build();
-
-            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.searchUserIdOrPasswordProc(pDTO))
-                    .orElseGet(() -> UserInfoDTO.builder().build());
-
-            userInfoService.newPasswordProc(pDTO);
-
-            // 비밀번호 재생성하는 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
-            session.setAttribute("NEW_PASSWORD", "");
-            session.removeAttribute("NEW_PASSWORD");
-
-            msg = "비밀번호가 재설정되었습니다.";
-
-        } else { // 비정상 접근
-            msg = "비정상 접근입니다.";
+        // 세션에서 userId가 null인지 확인
+        if (userId == null || userId.isEmpty()) {
+            msg = "세션이 만료되었습니다. 다시 비밀번호 찾기를 진행해주세요.";
+            model.addAttribute("msg", msg);
+            return "user/findId"; // 비밀번호 찾기 페이지로 이동
         }
+
+        // 새 비밀번호 받아오기
+        String password = CmmUtil.nvl(request.getParameter("password")); // 신규 비밀번호
+
+        log.info("Received userId: " + userId);
+        log.info("Received password: " + password);
+
+        // 신규 비밀번호를 해시로 암호화
+        String hashedPassword = EncryptUtil.encHashSHA256(password);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userId(userId)
+                .password(hashedPassword)
+                .build();
+
+        // 서비스로 DTO 전달
+        userInfoService.newPasswordProc(pDTO);
+
+        // 비밀번호 재생성하는 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
+        session.setAttribute("NEW_PASSWORD", "");
+        session.removeAttribute("NEW_PASSWORD");
+
+        msg = "비밀번호가 재설정되었습니다.";
 
         model.addAttribute("msg", msg);
 
-
         log.info(this.getClass().getName() + ".user/newPasswordProc End!");
 
-        return "user/newPasswordResult";
-
+        return "user/login";
     }
+
+
+
 }

@@ -28,10 +28,6 @@ public class UserInfoEntity implements Serializable {
     private String userName;
 
     @NonNull
-    @Column(name = "NICK_NAME", length = 100, nullable = false)
-    private String nickName;
-
-    @NonNull
     @Column(name = "PASSWORD", length = 100, nullable = false)
     private String password;
 
