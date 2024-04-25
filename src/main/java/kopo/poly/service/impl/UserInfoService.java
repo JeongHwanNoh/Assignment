@@ -138,7 +138,6 @@ public class UserInfoService implements IUserInfoService {
                     .addr1(addr1).addr2(addr2)
                     .regId(userId).regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                     .chgId(userId).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
-                    .gender(gender)
                     .genre(genre)
                     .build();
 
@@ -241,9 +240,6 @@ public class UserInfoService implements IUserInfoService {
 
         return res;
     }
-
-
-
     @Transactional
     @Override
     public void newPasswordProc(UserInfoDTO pDTO) throws Exception {
@@ -254,35 +250,92 @@ public class UserInfoService implements IUserInfoService {
 
         log.info("userId : " + userId);
 
-
-        // 사용자 ID로 사용자 엔티티 조회
         Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
 
         if (uEntity.isPresent()) {
-
             UserInfoEntity rEntity = uEntity.get();
 
             log.info("rEntity userId : " + rEntity.getUserId());
             log.info("rEntity password : " + rEntity.getPassword());
             log.info("rEntity userName : " + rEntity.getUserName());
             log.info("rEntity email : " + rEntity.getEmail());
+            log.info("rEntity addr1 : " + rEntity.getAddr1());
+            log.info("rEntity addr2 : " + rEntity.getAddr2());
 
             UserInfoEntity pEntity = UserInfoEntity.builder()
-                    .userId(rEntity.getUserId()).userName(rEntity.getUserName())
+                    .userId(rEntity.getUserId())
+                    .userName(rEntity.getUserName())
                     .password(pDTO.password())
                     .email(rEntity.getEmail())
-                    .regId(rEntity.getUserId()).regDt(rEntity.getRegDt())
-                    .chgId(rEntity.getUserId()).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
+                    .addr1(rEntity.getAddr1())
+                    .addr2(rEntity.getAddr2())
+                    .regId(rEntity.getRegId())
+                    .regDt(rEntity.getRegDt())
+                    .chgId(rEntity.getUserId())
+                    .chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
+                    .genre(rEntity.getGenre())
                     .build();
+
+            log.info("Building pEntity with addr1: " + pEntity.getAddr1() + ", addr2: " + pEntity.getAddr2());
 
             userInfoRepository.save(pEntity);
 
-            log.info("확인");
-
+            log.info("User info updated in database.");
+        } else {
+            log.info("No user found with userId: " + userId);
         }
 
         log.info(this.getClass().getName() + ".newPasswordProc End!");
     }
+
+
+
+//    @Transactional
+//    @Override
+//    public void newPasswordProc(UserInfoDTO pDTO) throws Exception {
+//
+//        log.info(this.getClass().getName() + ".newPasswordProc start!");
+//
+//        String userId = CmmUtil.nvl(pDTO.userId());
+//
+//        log.info("userId : " + userId);
+//
+//
+//        // 사용자 ID로 사용자 엔티티 조회
+//        // Select *
+//        // Froe 컬렉션
+//        // where UserId = (userId)
+//        Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
+//
+//        if (uEntity.isPresent()) {
+//
+//            UserInfoEntity rEntity = uEntity.get();
+//
+//            log.info("rEntity userId : " + rEntity.getUserId());
+//            log.info("rEntity password : " + rEntity.getPassword());
+//            log.info("rEntity userName : " + rEntity.getUserName());
+//            log.info("rEntity email : " + rEntity.getEmail());
+//            log.info("rEntity addr1 : " + rEntity.getAddr1());
+//            log.info("rEntity addr2 : " + rEntity.getAddr2());
+//
+//            UserInfoEntity pEntity = UserInfoEntity.builder()
+//                    .userId(rEntity.getUserId()).userName(rEntity.getUserName())
+//                    .password(pDTO.password())
+//                    .email(rEntity.getEmail())
+//                    .regId(rEntity.getUserId()).regDt(rEntity.getRegDt())
+//                    .chgId(rEntity.getUserId()).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
+//                    .gender(rEntity.getGender()) // 추가적인 필드
+//                    .genre(rEntity.getGenre())  // 추가적인 필드
+//                    .build();
+//
+//            userInfoRepository.save(pEntity);
+//
+//            log.info("확인");
+//
+//        }
+//
+//        log.info(this.getClass().getName() + ".newPasswordProc End!");
+//    }
 
 
     @Override
@@ -310,7 +363,7 @@ public class UserInfoService implements IUserInfoService {
         // 수정할 값들을 빌더를 통해 엔티티에 저장하기
         UserInfoEntity pEntity = UserInfoEntity.builder()
                 .userId(userId).addr1(addr1).addr2(addr2).email(email).genre(genre)
-                .gender(gender).password(pDTO.password())
+                .password(pDTO.password())
                 .build();
 
         // 데이터 수정하기

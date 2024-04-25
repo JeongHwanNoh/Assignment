@@ -80,6 +80,7 @@ public class NoticeService implements INoticeService {
         String noticeYn = CmmUtil.nvl(pDTO.noticeYn());
         String contents = CmmUtil.nvl(pDTO.contents());
         String userId = CmmUtil.nvl(pDTO.userId());
+        String userName = CmmUtil.nvl(pDTO.userName());
 
         log.info("noticeSeq : " + noticeSeq);
         log.info("title : " + title);
@@ -92,7 +93,7 @@ public class NoticeService implements INoticeService {
 
         // 수정할 값들을 빌더를 통해 엔티티에 저장하기
         NoticeEntity pEntity = NoticeEntity.builder()
-                .noticeSeq(noticeSeq).title(title).noticeYn(noticeYn).contents(contents).userId(userId)
+                .noticeSeq(noticeSeq).title(title).noticeYn(noticeYn).contents(contents).userId(userId).userName(userName)
                 .readCnt(rEntity.getReadCnt())
                 .build();
 
@@ -128,16 +129,18 @@ public class NoticeService implements INoticeService {
         String noticeYn = CmmUtil.nvl(pDTO.noticeYn());
         String contents = CmmUtil.nvl(pDTO.contents());
         String userId = CmmUtil.nvl(pDTO.userId());
+        String userName = CmmUtil.nvl(pDTO.userName());
 
         log.info("title : " + title);
         log.info("noticeYn : " + noticeYn);
         log.info("contents : " + contents);
         log.info("userId : " + userId);
+        log.info("userName : " + userName);
 
         // 공지사항 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
         // JPA에 자동 증가 설정을 해놨음
         NoticeEntity pEntity = NoticeEntity.builder()
-                .title(title).noticeYn(noticeYn).contents(contents).userId(userId).readCnt(0L)
+                .title(title).noticeYn(noticeYn).contents(contents).userId(userId).userName(userName).readCnt(0L)
                 .regId(userId).regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .chgId(userId).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .build();

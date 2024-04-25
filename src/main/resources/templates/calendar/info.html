@@ -3,9 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+    <script src="/js/ko.global.min.js"></script>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        var rList = [[${rList}]];
+    </script>
+
 
     <style>
+
+        .fc-day-sun a {
+            color: red;
+        }
+
+        /* 토요일 날짜: 파란색 */
+        .fc-day-sat a {
+            color: blue;
+        }
+
+        /* 캘린더 크기 조절 */
+        #calendar {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+
         /* 모달 스타일 */
         .modal {
             display: none;
@@ -17,12 +39,13 @@
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 1000;
         }
+
         .modal-content {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #fff;
+            background-color: #ffffff;
             padding: 20px;
             border-radius: 5px;
         }
@@ -65,167 +88,174 @@
 <div id="calendar"></div>
 
 <script>
-    var calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        initialView: 'dayGridMonth',
-        events: [],
-        eventClick: function(info) {
-            openModal('eventDetailModal');
-            var event = info.event;
-            if (info.el.classList.contains('fc-button')) {
-                return;
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: rList, // rList 데이터를 이용하여 캘린더에 이벤트 추가
+            locale: 'ko',
+            eventClick: function (info) {
+                openModal('eventDetailModal');
+                var event = info.event;
+                if (info.el.classList.contains('fc-button')) {
+                    return;
+                }
+
+                document.getElementById('eventDetailTitle').textContent = event.title;
+                document.getElementById('eventDetailStart').textContent = event.startStr;
+                document.getElementById('eventDetailEnd').textContent = event.endStr;
+                document.getElementById('eventDetailDescription').textContent = event.extendedProps.description;
+
+                currentEvent = event;
+            },
+            dateClick: function (info) {
+                openModal('eventModal');
+                document.getElementById('eventName').value = '';
+                document.getElementById('eventDate').value = info.dateStr;
+                document.getElementById('eventEndDate').value = '';
+                document.getElementById('eventDescription').value = '';
+                currentEvent = null;
+            }
+        });
+
+        calendar.render();
+
+        var currentEvent = null;
+        var currentModal = null;
+
+        function openModal(modalId) {
+            var modal = document.getElementById(modalId);
+            if (currentModal) {
+                currentModal.style.display = 'none';
+            }
+            modal.style.display = 'block';
+            currentModal = modal;
+        }
+
+        var closeModalButton = document.getElementById('closeModal');
+
+
+        document.getElementById('closeModal');
+        var editEventButton = document.getElementById('editEvent');
+        var deleteEventButton = document.getElementById('deleteEvent');
+
+        closeModalButton.addEventListener('click', function () {
+            if (currentModal) {
+                currentModal.style.display = 'none';
+            }
+            document.getElementById('eventForm').reset();
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target === currentModal) {
+                currentModal.style.display = 'none';
+                document.getElementById('eventForm').reset();
+            }
+        });
+
+        editEventButton.addEventListener('click', function () {
+            if (currentEvent) {
+                openModal('eventModal');
+                document.getElementById('eventName').value = currentEvent.title;
+                document.getElementById('eventDate').value = currentEvent.startStr;
+                document.getElementById('eventEndDate').value = currentEvent.endStr;
+                document.getElementById('eventDescription').value = currentEvent.extendedProps.description;
+            }
+        });
+
+        deleteEventButton.addEventListener('click', function () {
+            if (currentEvent) {
+                var calendarSeq = currentEvent.extendedProps.calendarSeq;
+                $.ajax({
+                    url: "/calendar/calendarDelete",
+                    type: "post",
+                    dataType: "JSON",
+                    data: {"calendarSeq": calendarSeq},
+                    success: function (json) {
+                        alert(json.msg);
+                        location.href = "/calendar/info";
+                    }
+                });
+                currentEvent.remove();
+                currentModal.style.display = 'none';
+            }
+        });
+
+        document.getElementById('eventForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var eventName = document.getElementById('eventName').value;
+            var eventDate = document.getElementById('eventDate').value;
+            var eventEndDate = document.getElementById('eventEndDate').value;
+            var eventDescription = document.getElementById('eventDescription').value;
+
+            if (currentEvent) {
+                updateEvent(currentEvent.extendedProps.calendarSeq, eventName, eventDate, eventEndDate, eventDescription);
+            } else {
+                insertEvent(eventName, eventDate, eventEndDate, eventDescription);
             }
 
-            openModal('eventDetailModal');
-            document.getElementById('eventDetailTitle').textContent = event.title;
-            document.getElementById('eventDetailStart').textContent = event.startStr;
-            document.getElementById('eventDetailEnd').textContent = event.endStr;
-            document.getElementById('eventDetailDescription').textContent = event.extendedProps.description;
-
-            currentEvent = event;
-        },
-        dateClick: function(info) {
-            openModal('eventModal');
-            document.getElementById('eventName').value = '';
-            document.getElementById('eventDate').value = info.dateStr;
-            document.getElementById('eventEndDate').value = '';
-            document.getElementById('eventDescription').value = '';
-            currentEvent = null;
-        }
-    });
-    calendar.render();
-
-    var currentEvent = null;
-    var currentModal = null;
-
-    function openModal(modalId) {
-        var modal = document.getElementById(modalId);
-        if (currentModal) {
-            currentModal.style.display = 'none';
-        }
-        modal.style.display = 'block';
-        currentModal = modal;
-    }
-
-    var closeModalButton = document.getElementById('closeModal');
-    var editEventButton = document.getElementById('editEvent');
-    var deleteEventButton = document.getElementById('deleteEvent');
-
-    closeModalButton.addEventListener('click', function() {
-        if (currentModal) {
-            currentModal.style.display = 'none';
-        }
-        document.getElementById('eventForm').reset();
-    });
-
-    window.addEventListener('click', function(event) {
-        if (event.target === currentModal) {
-            currentModal.style.display = 'none';
+            if (currentModal) {
+                currentModal.style.display = 'none';
+            }
             document.getElementById('eventForm').reset();
-        }
-    });
+        });
 
-    editEventButton.addEventListener('click', function() {
-        if (currentEvent) {
-            openModal('eventModal');
-            document.getElementById('eventName').value = currentEvent.title;
-            document.getElementById('eventDate').value = currentEvent.startStr;
-            document.getElementById('eventEndDate').value = currentEvent.endStr;
-            document.getElementById('eventDescription').value = currentEvent.extendedProps.description;
-        }
-    });
-
-    deleteEventButton.addEventListener('click', function () {
-        if (currentEvent) {
-            var calendarSeq = currentEvent.extendedProps.calendarSeq;
+        function insertEvent(eventName, eventDate, eventEndDate, eventDescription) {
             $.ajax({
-                url: "/calendar/calendarDelete",
+                url: "/calendar/calendarInsert",
                 type: "post",
                 dataType: "JSON",
-                data: {"calendarSeq": calendarSeq},
+                data: {
+                    title: eventName,
+                    start: eventDate,
+                    end: eventEndDate,
+                    description: eventDescription
+                },
+                success: function (json) {
+                    alert(json.msg);
+                    location.href = "/calendar/info";
+
+                    var calendarSeq = json.calendarSeq;
+                    calendar.addEvent({
+                        calendarSeq: calendarSeq,
+                        title: eventName,
+                        start: eventDate,
+                        end: eventEndDate,
+                        extendedProps: {
+                            description: eventDescription
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateEvent(calendarSeq, eventName, eventDate, eventEndDate, eventDescription) {
+            $.ajax({
+                url: "/calendar/calendarUpdate",
+                type: "post",
+                dataType: "JSON",
+                data: {
+                    "calendarSeq": calendarSeq,
+                    title: eventName,
+                    start: eventDate,
+                    end: eventEndDate,
+                    description: eventDescription
+                },
                 success: function (json) {
                     alert(json.msg);
                     location.href = "/calendar/info";
                 }
             });
-            currentEvent.remove();
-            currentModal.style.display = 'none';
+
+            currentEvent.setProp('title', eventName);
+            currentEvent.setStart(eventDate);
+            currentEvent.setEnd(eventEndDate);
+            currentEvent.setExtendedProp('description', eventDescription);
         }
     });
-
-    document.getElementById('eventForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        var eventName = document.getElementById('eventName').value;
-        var eventDate = document.getElementById('eventDate').value;
-        var eventEndDate = document.getElementById('eventEndDate').value;
-        var eventDescription = document.getElementById('eventDescription').value;
-
-        if (currentEvent) {
-            updateEvent(currentEvent.extendedProps.calendarSeq, eventName, eventDate, eventEndDate, eventDescription);
-        } else {
-            insertEvent(eventName, eventDate, eventEndDate, eventDescription);
-        }
-
-        if (currentModal) {
-            currentModal.style.display = 'none';
-        }
-        document.getElementById('eventForm').reset();
-    });
-
-    function insertEvent(eventName, eventDate, eventEndDate, eventDescription) {
-        $.ajax({
-            url: "/calendar/calendarInsert",
-            type: "post",
-            dataType: "JSON",
-            data: {
-                title: eventName,
-                start: eventDate,
-                end: eventEndDate,
-                description: eventDescription
-            },
-            success: function (json) {
-                alert(json.msg);
-                location.href = "/calendar/info";
-
-                var calendarSeq = json.calendarSeq;
-                calendar.addEvent({
-                    calendarSeq: calendarSeq,
-                    title: eventName,
-                    start: eventDate,
-                    end: eventEndDate,
-                    extendedProps: {
-                        description: eventDescription
-                    }
-                });
-            }
-        });
-    }
-
-    function updateEvent(calendarSeq, eventName, eventDate, eventEndDate, eventDescription) {
-        var calendarSeq = currentEvent.extendedProps.calendarSeq;
-        $.ajax({
-            url: "/calendar/calendarUpdate",
-            type: "post",
-            dataType: "JSON",
-            data: {
-                "calendarSeq": calendarSeq,
-                title: eventName,
-                start: eventDate,
-                end: eventEndDate,
-                description: eventDescription
-            },
-            success: function (json) {
-                alert(json.msg);
-                location.href = "/calendar/info";
-            }
-        });
-
-        currentEvent.setProp('title', eventName);
-        currentEvent.setStart(eventDate);
-        currentEvent.setEnd(eventEndDate);
-        currentEvent.setExtendedProp('description', eventDescription);
-    }
 </script>
 </body>
 </html>
+
 

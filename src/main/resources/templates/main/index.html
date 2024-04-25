@@ -20,11 +20,9 @@
 
     <script src="js/scripts.js"></script>
     <script>
-        // 사용자의 SS_USER_ID로 로그인 상태 확인
-        // 페이지 로드 시 버튼 표시 설정
         // 페이지 로드 시 실행되는 함수
         $(document).ready(function () {
-            // 로그인 상태 확인
+            // 페이지 로드 시 로그인 상태 확인
             var isLoggedIn = checkLoginStatus();
 
             // 로그인 상태에 따라 버튼 표시
@@ -32,10 +30,12 @@
         });
 
         // 사용자 로그인 상태 확인 함수
+        const sessionID = [[${SS_USER_ID}]];
         function checkLoginStatus() {
-            // 여기에서는 이미 섹션 아이디를 확인하여 로그인 상태를 판단한다고 가정
-            // 만약 섹션 아이디가 null이라면 로그인 상태가 아닌 것으로 간주
-            return SS_USER_ID !== null;
+            // 세션 ID 가져오기
+            // const sessionID = '<%= session.getAttribute("SS_USER_ID") %>';
+            console.log("Session ID:", sessionID); // 세션 ID 로그로 출력
+            return sessionID !== null && sessionID !== ''; // 세션 ID가 null이 아니고 비어있지 않으면 로그인 상태로 간주
         }
 
         // 로그인 상태에 따라 다른 버튼을 표시하는 함수
@@ -66,7 +66,7 @@
 
                         if (json.result === 1) { // 로그아웃 성공
                             alert(json.msg); // 메시지 띄우기
-                            location.href = "/html/index.html"; // 메인화면으로 이동
+                            location.href = "/main/index"; // 메인화면으로 이동
 
                         } else { // 로그인 실패
                             alert(json.msg); // 메시지 띄우기
@@ -92,7 +92,7 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
-                    <li class="nav-item"><a class="nav-link" href="index">홈</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/calendar/info">일정</a></li>
                     <li class="nav-item"><a class="nav-link" href="book">도서</a></li>
                     <li class="nav-item"><a class="nav-link" href="plan">목표</a></li>
                     <li class="nav-item"><a class="nav-link" href="search">도서관 찾기</a></li>
@@ -111,12 +111,14 @@
                     <!-- Header text content-->
                     <div class="text-center text-xxl-start">
                         <div class="badge bg-gradient-primary-to-secondary text-white mb-4">
-                            <div class="text-uppercase">Design &middot; Development &middot; Marketing</div>
+                            <div class="text-uppercase">작은 도서관</div>
                         </div>
                         <div class="fs-3 fw-light text-muted">I can help your business to</div>
                         <h1 class="display-3 fw-bolder mb-5"><span
-                                class="text-gradient d-inline">작은 도서관에 오신 것을 환영합니다.</span>
+                                class="text-gradient d-inline">작은 도서관에</span>
+                                <span class="text-gradient d-inline">오신 것을 환영합니다.</span>
                         </h1>
+
                         <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xxl-start mb-3">
                             <a class="btn btn-primary btn-lg px-5 py-3 me-sm-3 fs-6 fw-bolder"
                                href="../../../../../../../Users/data8316-7/Downloads/startbootstrap-personal-gh-pages%20(1)/startbootstrap-personal-gh-pages/resume.html">Resume</a>
@@ -262,51 +264,7 @@
             </div>
         </div>
     </header>
-
-
-    <!-- About Section-->
-    <!--    <section class="bg-light py-5">-->
-    <!--        <div class="container px-5">-->
-    <!--            <div class="row gx-5 justify-content-center">-->
-    <!--                <div class="col-xxl-8">-->
-    <!--                    <div class="text-center my-5">-->
-    <!--                        <h2 class="display-5 fw-bolder"><span class="text-gradient d-inline">About Me</span></h2>-->
-    <!--                        <p class="lead fw-light mb-4">My name is Start Bootstrap and I help brands grow.</p>-->
-    <!--                        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit dolorum-->
-    <!--                            itaque qui unde quisquam consequatur autem. Eveniet quasi nobis aliquid cumque officiis sed-->
-    <!--                            rem iure ipsa! Praesentium ratione atque dolorem?</p>-->
-    <!--                        <div class="d-flex justify-content-center fs-2 gap-4">-->
-    <!--                            <a class="text-gradient" href="#!"><i class="bi bi-twitter"></i></a>-->
-    <!--                            <a class="text-gradient" href="#!"><i class="bi bi-linkedin"></i></a>-->
-    <!--                            <a class="text-gradient" href="#!"><i class="bi bi-github"></i></a>-->
-    <!--                        </div>-->
-    <!--                    </div>-->
-    <!--                </div>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </section>-->
 </main>
-<!-- Footer-->
-<!--<footer class="bg-white py-4 mt-auto">-->
-<!--    <div class="container px-5">-->
-<!--        <div class="row align-items-center justify-content-between flex-column flex-sm-row">-->
-<!--            <div class="col-auto">-->
-<!--                <div class="small m-0">Copyright &copy; Your Website 2023</div>-->
-<!--            </div>-->
-<!--            <div class="col-auto">-->
-<!--                <a class="small" href="#!">도서</a>-->
-<!--                <span class="mx-1">&middot;</span>-->
-<!--                <a class="small" href="#!">목표</a>-->
-<!--                <span class="mx-1">&middot;</span>-->
-<!--                <a class="small" href="#!">로그인</a>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</footer>-->
-<!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Core theme JS-->
-
-
 </body>
 </html>

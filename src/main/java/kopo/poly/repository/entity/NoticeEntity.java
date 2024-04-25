@@ -34,6 +34,10 @@ public class NoticeEntity {
     private String contents;
 
     @NonNull
+    @Column(name = "user_name", nullable = false)
+    private String userName;
+
+    @NonNull
     @Column(name = "user_id", nullable = false)
     private String userId;
 

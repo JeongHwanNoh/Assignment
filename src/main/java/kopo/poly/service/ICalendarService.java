@@ -9,7 +9,7 @@ public interface ICalendarService {
     /**
      * 공지사항 전체 가져오기
      */
-    List<CalendarDTO> getCalendarList();
+    List<CalendarDTO> getCalendarList(String userId);
 
     /**
      * 해당 공지사항 수정하기

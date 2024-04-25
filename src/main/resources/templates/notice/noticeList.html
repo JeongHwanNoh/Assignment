@@ -1,43 +1,141 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>공지 리스트</title>
-    <link rel="stylesheet" href="/css/table.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script type="text/javascript">
-
-        //상세보기 이동
-        function doDetail(seq) {
-            location.href = "/notice/noticeInfo?nSeq=" + seq;
+        function showMyPosts() {
+            var userId = '<%= session.getAttribute("SS_USER_ID") %>';
+            location.href = "/notice/noticealone?userId=" + userId;
+        }
+    </script>
+    <style>
+        /* 컨테이너 스타일 */
+        .container {
+            margin-top: 50px;
         }
 
-    </script>
+        /* 테이블 스타일 */
+        .table-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .table-header {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* 버튼 스타일 */
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            margin-top: 10px; /* 위쪽으로 여백 추가 */
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        /* 테이블 내 글씨 크기 조절 */
+        .table td, .table th {
+            font-size: 14px;
+            text-align: center; /* 가운데 정렬 추가 */
+            overflow: hidden; /* 넘치는 텍스트 숨김 */
+            white-space: nowrap; /* 줄 바꿈 방지 */
+            text-overflow: ellipsis; /* 텍스트가 넘칠 때 생략 부호(...) 표시 */
+        }
+
+        /* 공지사항 표시 글씨 크기 조절 */
+        .notice {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center; /* 가운데 정렬 추가 */
+        }
+
+        /* 순번 크기에 맞추기 */
+        .table-container table td:first-child {
+            width: 60px; /* 순번이 차지하는 공간 크기 */
+        }
+
+        /* 제목 폭 넓히기 */
+        .table-container table td:nth-child(2) {
+            width: 40%; /* 적절한 폭 설정 */
+            text-align: left; /* 왼쪽 정렬 추가 */
+        }
+
+        /* 조회수, 등록자, 등록일 폭 설정 */
+        .table-container table td:nth-child(n+3) {
+            width: 10%; /* 적절한 폭 설정 */
+        }
+
+        /* 번호 열 폭 설정 */
+        .table-container table td:first-child {
+            width: 5%; /* 적절한 폭 설정 */
+        }
+
+        /* 메뉴 스타일 */
+        .menu-container {
+            background-color: #007bff;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        .menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu li {
+            display: inline;
+        }
+
+        .menu li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-right: 1px solid #0056b3;
+        }
+
+        .menu li a:last-child {
+            border-right: none;
+        }
+
+        .menu li a:hover {
+            background-color: #0056b3;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-<h2>공지사항</h2>
-<hr/>
-<br/>
-<div class="divTable minimalistBlack">
-    <div class="divTableHeading">
-        <div class="divTableRow">
-            <div class="divTableHead">순번</div>
-            <div class="divTableHead">제목</div>
-            <div class="divTableHead">조회수</div>
-            <div class="divTableHead">등록자</div>
-            <div class="divTableHead">등록일</div>
-        </div>
+<div class="container">
+    <div class="table-container">
+        <h2>공지사항</h2>
+        <table class="table table-bordered">
+            <!-- 테이블 헤더 생략 -->
+            <tbody>
+            <!-- 공지 리스트 반복 -->
+            <tr th:each="dto: ${rList}">
+                <td th:text="${dto.noticeSeq}"></td>
+                <th:block th:with="detailUrl=@{'/notice/noticeInfo?nSeq=' + ${dto.noticeSeq}}">
+                    <td>
+                        <a th:href="${detailUrl}" th:text="${dto.title}"></a>
+                    </td>
+                </th:block>
+                <td th:text="${dto.readCnt}"></td>
+                <td th:text="${dto.userName}"></td>
+                <td th:text="${dto.regDt}"></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
-    <div class="divTableBody">
-        <div class="divTableRow" th:each="dto: ${rList}">
-            <div class="divTableCell" th:if="${dto.noticeYn=='Y'}" th:text="공지사항"></div>
-            <div class="divTableCell" th:unless="${dto.noticeYn=='Y'}" th:text="${dto.noticeSeq}"></div>
-            <div class="divTableCell" th:text="${dto.title}" th:onclick="doDetail([[${dto.noticeSeq}]])"></div>
-            <div class="divTableCell" th:text="${dto.readCnt}"></div>
-            <div class="divTableCell" th:text="${dto.userName}"></div>
-            <div class="divTableCell" th:text="${dto.regDt}"></div>
-        </div>
-    </div>
+    <!-- "내가 쓴 글" 버튼 -->
+    <button onclick="showMyPosts()" class="btn btn-primary float-right">내가 쓴 글</button>
 </div>
-<a href="/notice/noticeReg">글쓰기</a>
 </body>
 </html>

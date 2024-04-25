@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,22 +25,29 @@ public class CalendarService implements ICalendarService {
     // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
     private final CalendarRepository calendarRepository;
 
+    // 서비스 계층의 getCalendarList 메서드 수정
     @Override
-    public List<CalendarDTO> getCalendarList() {
-        log.info(this.getClass().getName() + ".getCalendarList Start!");
+    public List<CalendarDTO> getCalendarList(String userId) {
+        log.info("Fetching calendar data for user: {}", userId);
 
-        // 공지사항 전체 리스트 조회하기
-        List<CalendarEntity> rList = calendarRepository.findAllByOrderByCalendarSeqDesc();
+        List<CalendarEntity> rList = calendarRepository.findAllByUserIdOrderByCalendarSeqDesc(userId);
 
-        // 엔티티의 값들을 DTO에 맞게 넣어주기
-        List<CalendarDTO> nList = new ObjectMapper().convertValue(rList,
-                new TypeReference<>() {
-                });
+        List<CalendarDTO> nList = rList.stream()
+                .map(calendarEntity -> CalendarDTO.builder()
+                        .calendarSeq(calendarEntity.getCalendarSeq())
+                        .title(calendarEntity.getTitle())
+                        .userId(calendarEntity.getUserId())
+                        .start(calendarEntity.getStart())
+                        .end(calendarEntity.getEnd())
+                        .description(calendarEntity.getDescription())
+                        .build())
+                .collect(Collectors.toList());
 
-        log.info(this.getClass().getName() + ".getCalendarList End!");
+        log.info("Calendar data fetched successfully for user: {}", userId);
 
         return nList;
     }
+
 
     @Override
     public void updateCalendarInfo(CalendarDTO pDTO) throws Exception {

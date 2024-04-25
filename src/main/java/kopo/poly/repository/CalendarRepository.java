@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CalendarRepository extends JpaRepository<CalendarEntity, Long> {
 
-    List<CalendarEntity> findAllByOrderByCalendarSeqDesc();
+    List<CalendarEntity> findAllByUserIdOrderByCalendarSeqDesc(String userId);
 
     /**
      * 공지사항 리스트

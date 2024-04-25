@@ -7,16 +7,15 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.io.Serializable;
 
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "USER_INFO")
 @DynamicInsert
 @DynamicUpdate
 @Builder
+@Getter
 @Entity
 @Cacheable
-
 public class UserInfoEntity implements Serializable {
 
     @Id
@@ -56,9 +55,6 @@ public class UserInfoEntity implements Serializable {
 
     @Column(name = "CHG_DT")
     private String chgDt;
-
-    @Column(name = "GENDER", length = 100, nullable = false)
-    private String gender;
 
     @Column(name = "GENRE", length = 100, nullable = false)
     private String genre;

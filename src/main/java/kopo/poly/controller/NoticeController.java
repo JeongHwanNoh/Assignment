@@ -52,7 +52,8 @@ public class NoticeController {
         // 로그인된 사용자 아이디는 Session에 저장함
         // 교육용으로 아직 로그인을 구현하지 않았기 때문에 Session에 데이터를 저장하지 않았음
         // 추후 로그인을 구현할 것으로 가정하고, 공지사항 리스트 출력하는 함수에서 로그인 한 것처럼 Session 값을 생성함
-        session.setAttribute("SESSION_USER_ID", "USER01");
+        String SS_USER_ID = (String) session.getAttribute("SS_USER_ID");
+        log.info("SS_USER_ID : " + SS_USER_ID);
 
         // 공지사항 리스트 조회하기
         // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
@@ -113,6 +114,7 @@ public class NoticeController {
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String noticeYn = CmmUtil.nvl(request.getParameter("noticeYn")); // 공지글 여부
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
+            String userName = CmmUtil.nvl(request.getParameter("userName")); // 내용
 
             /*
              * ####################################################################################
@@ -125,7 +127,7 @@ public class NoticeController {
             log.info("contents : " + contents);
 
             // 데이터 저장하기 위해 DTO에 저장하기
-            NoticeDTO pDTO = NoticeDTO.builder().userId(userId).title(title)
+            NoticeDTO pDTO = NoticeDTO.builder().userId(userId).title(title).userName(userName)
                     .noticeYn(noticeYn).contents(contents).build();
 
             /*
@@ -241,6 +243,7 @@ public class NoticeController {
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String noticeYn = CmmUtil.nvl(request.getParameter("noticeYn")); // 공지글 여부
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
+            String userName = CmmUtil.nvl(request.getParameter("userName")); // 내용
 
             /*
              * ####################################################################################
@@ -257,7 +260,7 @@ public class NoticeController {
              * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
              */
             NoticeDTO pDTO = NoticeDTO.builder().userId(userId).noticeSeq(Long.parseLong(nSeq))
-                    .title(title).noticeYn(noticeYn).contents(contents).build();
+                    .title(title).noticeYn(noticeYn).contents(contents).userName(userName).build();
 
             // 게시글 수정하기 DB
             noticeService.updateNoticeInfo(pDTO);
