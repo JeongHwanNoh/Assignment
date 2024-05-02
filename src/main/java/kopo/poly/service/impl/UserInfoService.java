@@ -1,9 +1,11 @@
 package kopo.poly.service.impl;
 
 import jakarta.transaction.Transactional;
+import kopo.poly.dto.CalendarDTO;
 import kopo.poly.dto.MailDTO;
 import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.repository.UserInfoRepository;
+import kopo.poly.repository.entity.CalendarEntity;
 import kopo.poly.repository.entity.NoticeEntity;
 import kopo.poly.repository.entity.UserInfoEntity;
 import kopo.poly.service.IMailService;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +32,27 @@ public class UserInfoService implements IUserInfoService {
     private final MailService mailService;
 
 
+    @Override
+    public List<UserInfoDTO> getUserList(String userId) {
+        log.info("Fetching data for user: {}", userId);
+
+        List<UserInfoEntity> rList = userInfoRepository.findAllByUserIdOrderByCalendarSeqDesc(userId);
+
+        List<UserInfoDTO> nList = rList.stream()
+                .map(UserInfoEntity -> UserInfoDTO.builder()
+                        .userId(userinfoEntity.getuserId())
+                        .title(calendarEntity.getTitle())
+                        .userId(calendarEntity.getUserId())
+                        .start(calendarEntity.getStart())
+                        .end(calendarEntity.getEnd())
+                        .description(calendarEntity.getDescription())
+                        .build())
+                .collect(Collectors.toList());
+
+        log.info("Calendar data fetched successfully for user: {}", userId);
+
+        return nList;
+    }
     // 아이디 중복체크
     @Override
     public UserInfoDTO getUserIdExists(UserInfoDTO pDTO) throws Exception {

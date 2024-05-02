@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <title>회원정보 프로필</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .profile-icon {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #ddd;
+            text-align: center;
+            line-height: 150px;
+            font-size: 48px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            pointer-events: none;
+            background-color: #f0f0f0;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            pointer-events: none;
+            background-color: #f0f0f0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="profile-icon">👤</div>
+    <label for="userId">아이디</label>
+    <input type="text" id="userId" name="userId" value="홍길동" readonly>
+    <label for="userName">이름</label>
+    <input type="text" id="userName" name="userName" value="홍길동" readonly>
+    <label for="email">이메일</label>
+    <input type="email" id="email" name="email" value="example@example.com" readonly>
+
+    <h2>추가 정보</h2>
+    <label for="addr1">거주지</label>
+    <input type="text" id="addr1" name="addr1" value="서울" readonly>
+    <label for="addr2">상세주소</label>
+    <input type="text" id="addr2" name="addr2" value="서울" readonly>
+    <label for="genre">장르</label>
+    <input type="text" id="genre" name="genre" value="서울" readonly>
+    
+    
+    <button type="button" disabled>비밀번호 변경</button>
+    <button type="button" disabled>프로필 수정</button>
+    <button type="button" disabled>계정 삭제</button>
+</div>
+</body>
+</html>

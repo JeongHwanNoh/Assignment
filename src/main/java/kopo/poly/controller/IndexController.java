@@ -28,6 +28,9 @@ public class IndexController {
         log.info(this.getClass().getName() + ".index Start!");
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
         String SS_USER_ID = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("SS_USER_ID", SS_USER_ID);
+
         log.info("SS_USER_ID : " + SS_USER_ID);
 
         log.info(this.getClass().getName() + ".index End!");

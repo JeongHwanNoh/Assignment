@@ -2,6 +2,7 @@ package kopo.poly.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kopo.poly.dto.CalendarDTO;
 import kopo.poly.dto.MsgDTO;
 import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.repository.entity.UserInfoEntity;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -166,6 +169,30 @@ public class UserInfoController {
         log.info(this.getClass().getName() + ".user/searchUserId End!");
 
         return "user/findId";
+    }
+
+    @GetMapping(value = "mypage")
+    public String mypage(HttpSession session, ModelMap model) {
+        log.info(this.getClass().getName() + ".user/mypage Start!");
+
+        log.info("Fetching calendar data from the database...");
+
+        // 세션에서 사용자 아이디 가져오기
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        log.info("User ID: " + userId);
+
+        // 공지사항 리스트 조회하기
+        List<CalendarDTO> rList = Optional.ofNullable(userInfoService.getUserList(userId))
+                .orElseGet(ArrayList::new);
+
+        // 조회된 리스트 결과값 넣어주기
+        model.addAttribute("rList", rList);
+
+        log.info("확인" + rList);
+
+        log.info(this.getClass().getName() + ".user/mypage End!");
+
+        return "user/mypage";
     }
 
     @GetMapping(value = "newPassword")

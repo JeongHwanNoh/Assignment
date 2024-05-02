@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"
           rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet"/>
     <!-- Core theme CSS (includes Bootstrap)-->
@@ -20,61 +21,62 @@
 
     <script src="js/scripts.js"></script>
     <script>
+        // 사용자 로그인 상태 확인 함수
+        function checkLoginStatus() {
+            // 세션 ID 가져오기
+            const SS_USER_ID = '[[${SS_USER_ID}]]';
+            // 알림으로 세션 ID 값 보여주기
+            return SS_USER_ID !== null && SS_USER_ID !== ''; // 세션 ID가 null이 아니고 비어있지 않으면 로그인 상태로 간주
+        }
+
         // 페이지 로드 시 실행되는 함수
         $(document).ready(function () {
             // 페이지 로드 시 로그인 상태 확인
             var isLoggedIn = checkLoginStatus();
 
-            // 로그인 상태에 따라 버튼 표시
-            displayButtons(isLoggedIn);
-        });
-
-        // 사용자 로그인 상태 확인 함수
-        const sessionID = [[${SS_USER_ID}]];
-        function checkLoginStatus() {
-            // 세션 ID 가져오기
-            // const sessionID = '<%= session.getAttribute("SS_USER_ID") %>';
-            console.log("Session ID:", sessionID); // 세션 ID 로그로 출력
-            return sessionID !== null && sessionID !== ''; // 세션 ID가 null이 아니고 비어있지 않으면 로그인 상태로 간주
-        }
-
-        // 로그인 상태에 따라 다른 버튼을 표시하는 함수
-        function displayButtons(isLoggedIn) {
-            if (isLoggedIn) {
-                // 로그인 상태인 경우 - 마이페이지와 로그아웃 버튼 표시
-                $("#mypageButton").show();
-                $("#btnLogout").show();
-                $("#loginButton").hide(); // 로그인 버튼 숨김
-            } else {
-                // 로그인 상태가 아닌 경우 - 마이페이지와 로그아웃 버튼 숨김, 현재의 로그인 버튼 표시
-                $("#mypageButton").hide();
-                $("#btnLogout").hide();
-                $("#loginButton").show(); // 로그인 버튼 표시
+            // 로그인 상태에 따라 버튼을 표시하거나 숨기는 함수
+            function displayButtons(isLoggedIn) {
+                if (isLoggedIn) {
+                    // 로그인 상태인 경우 - 마이페이지와 로그아웃 버튼 표시
+                    $("#mypageButton").show();
+                    $("#btnLogout").show();
+                    $("#loginButton").hide(); // 로그인 버튼 숨김
+                    $("#reButton").hide(); // 로그인 버튼 표시
+                } else {
+                    // 로그인 상태가 아닌 경우 - 마이페이지와 로그아웃 버튼 숨김, 현재의 로그인 버튼 표시
+                    $("#mypageButton").hide();
+                    $("#btnLogout").hide();
+                    $("#loginButton").show(); // 로그인 버튼 표시
+                    $("#reButton").show(); // 로그인 버튼 표시
+                }
             }
-        }
 
-
-        $(document).ready(function () {
-            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+            // 로그아웃 버튼 클릭 시 로그아웃 함수 실행
             $("#btnLogout").on("click", function () {
-                // Ajax 호출해서 로그인하기
+                logOut();
+            });
+
+
+            // 로그아웃 함수
+            function logOut() {
                 $.ajax({
                     url: "/user/logout",
                     type: "post", // 전송방식은 Post
                     dataType: "JSON", // 전송 결과는 JSON으로 받기
                     success: function (json) {
-
                         if (json.result === 1) { // 로그아웃 성공
                             alert(json.msg); // 메시지 띄우기
                             location.href = "/main/index"; // 메인화면으로 이동
-
                         } else { // 로그인 실패
                             alert(json.msg); // 메시지 띄우기
                         }
                     }
                 })
-            })
-        })
+            }
+
+            // 페이지 로드 시 버튼 표시 여부 설정
+            displayButtons(isLoggedIn);
+        });
     </script>
 
     </head>
@@ -92,13 +94,15 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
+                    <li class="nav-item"><a class="nav-link" href="/notice/noticeList">게시판</a></li>
                     <li class="nav-item"><a class="nav-link" href="/calendar/info">일정</a></li>
                     <li class="nav-item"><a class="nav-link" href="book">도서</a></li>
                     <li class="nav-item"><a class="nav-link" href="plan">목표</a></li>
-                    <li class="nav-item"><a class="nav-link" href="search">도서관 찾기</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/library/search">도서관 찾기</a></li>
                     <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
-                    <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/login">마이페이지</a></li>
-                    <li class="nav-item"><a id="btnLogout" class="nav-link" type=button>로그아웃</a></li>
+                    <li class="nav-item"><a id="reButton" class="nav-link" href="/user/userRegForm">회원가입</a></li>
+                    <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/mypage">마이페이지</a></li>
+                    <li class="nav-item"><a id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
                 </ul>
             </div>
         </div>

@@ -1,24 +1,98 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>공지사항 수정하기</title>
-    <link rel="stylesheet" href="/css/table.css"/>
+    <style>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 50%; /* 조금 줄였습니다 */
+            margin: 20px auto;
+            text-align: left; /* 열 가운데 정렬 */
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            padding: 8px;
+            text-align: center; /* 텍스트 가운데 정렬 추가 */
+        }
+
+        th {
+            background-color: #007bff;
+            width: 20%; /* 열의 크기를 줄였습니다 */
+            color: white; /* 제목 글자색을 하얀색으로 설정합니다 */
+        }
+
+        .btn-group {
+            margin-top: 20px;
+            text-align: center; /* 버튼 가운데 정렬 */
+        }
+
+        .btn-group button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn-group button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 수정된 스타일 */
+        #btnDelete {
+            background-color: #dc3545;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea {
+            background-color: #f8f9fa; /* 입력필드 배경색 설정 */
+            border: 1px solid #ced4da; /* 입력필드 테두리 설정 */
+            padding: 8px;
+            width: 95%;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            resize: vertical; /* textarea 크기 조절 가능하게 설정 */
+        }
+
+        /* 입력필드 포커스시 테두리 색상 변경 */
+        input[type="text"]:focus,
+        textarea:focus {
+            border: 1px solid #007bff;
+        }
+
+    </style>
+    </style>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
-
         // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
             // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
             $("#btnSend").on("click", function () {
                 doSubmit(); // 공지사항 수정하기 실행
-            })
-        })
+            });
+        });
 
         //글자 길이 바이트 단위로 체크하기(바이트값 전달)
         function calBytes(str) {
             let tcount = 0;
-            let tmpStr = String(str);            let strCnt = tmpStr.length;
+            let tmpStr = String(str);
+            let strCnt = tmpStr.length;
             let onechar;
             for (let i = 0; i < strCnt; i++) {
                 onechar = tmpStr.charAt(i);
@@ -46,18 +120,6 @@
                 f.title.focus();
                 return;
             }
-            let noticeCheck = false; //체크 여부 확인 변수
-            for (let i = 0; i < f.noticeYn.length; i++) {
-                if (f.noticeYn[i].checked) {
-                    noticeCheck = true;
-                    break;
-                }
-            }
-            if (noticeCheck === false) {
-                alert("공지글 여부를 선택하시기 바랍니다.");
-                f.noticeYn[0].focus();
-                return;
-            }
             if (f.contents.value === "") {
                 alert("내용을 입력하시기 바랍니다.");
                 f.contents.focus();
@@ -69,7 +131,7 @@
                 return;
             }
 
-            // Ajax 호출해서 글 등록하기
+            // Ajax 호출해서 글 수정하기
             $.ajax({
                     url: "/notice/noticeUpdate",
                     type: "post", // 전송방식은 Post
@@ -77,54 +139,31 @@
                     data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
                     success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
                         alert(json.msg); // 메시지 띄우기
-                        // location.href = "/notice/noticeList"; // 공지사항 리스트 이동
+                        location.href = "/notice/noticeList"; // 공지사항 리스트 이동
                     }
                 }
-            )
+            );
         }
     </script>
 </head>
 <body>
-<h2>공지사항 수정하기</h2>
-<hr/>
 <br/>
 <form name="f" id="f">
     <input type="hidden" name="nSeq" th:value="${rDTO.noticeSeq}"/>
-    <div class="divTable minimalistBlack">
-        <div class="divTableBody">
-            <div class="divTableRow">
-                <div class="divTableCell">제목</div>
-                <div class="divTableCell">
-                    <input type="text" name="title" maxlength="100" th:value="${rDTO.title}"
-                           style="width: 95%"/>
-                </div>
-            </div>
-            <div class="divTableRow">
-                <div class="divTableCell">공지글 여부</div>
-                <div class="divTableCell">
-                    예<input type="radio" name="noticeYn" value="Y" th:checked="${rDTO.noticeYn eq 'Y'}"/>
-                    아니오<input type="radio" name="noticeYn" value="N" th:checked="${rDTO.noticeYn eq 'N'}"/>
-                </div>
-            </div>
-            <div class="divTableRow">
-                <div class="divTableCell">조회수</div>
-                <div class="divTableCell" th:text="${rDTO.readCnt}">
-                </div>
-            </div>
-            <div class="divTableRow">
-                <div class="divTableCell">내용</div>
-                <div class="divTableCell">
-                    <textarea name="contents"
-                              style="width: 95%; height: 400px" th:text="${rDTO.contents}"></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div>
+    <table>
+        <tr>
+            <th>제목</th>
+            <td><input type="text" name="title" maxlength="100" th:value="${rDTO.title}" style="width: 95%"/></td>
+        </tr>
+        <tr>
+            <th>내용</th>
+            <td><textarea name="contents" style="width: 95%; height: 400px" th:text="${rDTO.contents}"></textarea></td>
+        </tr>
+    </table>
+    <div class="btn-group">
         <button id="btnSend" type="button">수정</button>
         <button type="reset">다시 작성</button>
     </div>
 </form>
 </body>
 </html>
-

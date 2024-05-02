@@ -7,7 +7,6 @@ public record NoticeDTO(
         
         Long noticeSeq, // 기본키, 순번
         String title, // 제목
-        String noticeYn, // 공지글 여부
         String contents, // 글 내용
         String userId, // 작성자
         long readCnt, // 조회수
