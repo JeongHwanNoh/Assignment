@@ -1,9 +1,14 @@
 package kopo.poly.service;
 
+import kopo.poly.dto.CalendarDTO;
 import kopo.poly.dto.NoticeDTO;
 import kopo.poly.dto.UserInfoDTO;
 
+import java.util.List;
+
 public interface IUserInfoService {
+
+    List<UserInfoDTO> getUserList(String userId);
     UserInfoDTO getUserIdExists(UserInfoDTO pDTO) throws Exception;
 
     // 이메일 주소 중복 체크 및 인증 값

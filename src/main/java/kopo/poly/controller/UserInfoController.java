@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.CalendarDTO;
 import kopo.poly.dto.MsgDTO;
+import kopo.poly.dto.NoticeDTO;
 import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.repository.entity.UserInfoEntity;
 import kopo.poly.service.IUserInfoService;
@@ -11,6 +12,7 @@ import kopo.poly.util.CmmUtil;
 import kopo.poly.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequestMapping(value = "/user")
@@ -33,13 +36,6 @@ public class UserInfoController {
         log.info(this.getClass().getName() + ".user/userRegForm end");
 
         return "user/userRegForm";
-    }
-    @GetMapping(value="userRegForm2")
-    public String userRegForm2() {
-        log.info(this.getClass().getName() + ".user/userRegForm start");
-        log.info(this.getClass().getName() + ".user/userRegForm end");
-
-        return "user/userRegForm2";
     }
 
     @ResponseBody
@@ -181,9 +177,9 @@ public class UserInfoController {
         String userId = (String) session.getAttribute("SS_USER_ID");
         log.info("User ID: " + userId);
 
-        // 공지사항 리스트 조회하기
-        List<CalendarDTO> rList = Optional.ofNullable(userInfoService.getUserList(userId))
+        List<UserInfoDTO> rList = Optional.ofNullable(userInfoService.getUserList(userId))
                 .orElseGet(ArrayList::new);
+
 
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rList", rList);
@@ -194,6 +190,7 @@ public class UserInfoController {
 
         return "user/mypage";
     }
+
 
     @GetMapping(value = "newPassword")
     public String newPassword() {
@@ -301,44 +298,50 @@ public class UserInfoController {
 
     }
 
-    /**
-     * 비밀번호 찾기 로직 수행
-     * <p>
-     * 아이디, 이름, 이메일 일치하면, 비밀번호 재발급 화면 이동
-     */
-//    @PostMapping(value = "searchPasswordProc")
-//    public String searchPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
-//        log.info(this.getClass().getName() + ".searchPasswordProc Start!");
-//
-//        String userId = CmmUtil.nvl(request.getParameter("userId"));
-//        String email = CmmUtil.nvl(request.getParameter("email"));
-//        String userName = CmmUtil.nvl(request.getParameter("userName"));
-//
-//        log.info("userId: " + userId);
-//        log.info("email: " + email);
-//        log.info("userName: " + userName);
-//
-//        UserInfoDTO pDTO = UserInfoDTO.builder()
-//                .userId(userId)
-//                .userName(userName)
-//                .email(EncryptUtil.encAES128CBC(email))
-//                .build();
-//
-//        String password = userInfoService.searchPasswordProc(pDTO);
-//
-//        log.info("Retrieved password: " + password);
-//
-//        if (password != null && !password.isEmpty()) {
-//            session.setAttribute("NEW_PASSWORD_USER_ID", userId);
-//            log.info("성공 : " + password);
-//
-//            return "user/newPassword"; // 사용자 정보를 보여주는 페이지로 이동
-//        } else {
-//            log.info("실패 : " + password);
-//            // 해당하는 사용자를 찾을 수 없을 때의 처리
-//            return "user/login"; // 사용자 찾기 페이지로 다시 이동
-//        }
-//    }
+    @ResponseBody
+    @PostMapping(value = "userDelete")
+    public MsgDTO userDelete(HttpServletRequest request) {
+
+        log.info(this.getClass().getName() + ".Delete Start!");
+
+        String msg = ""; // 메시지 내용
+        MsgDTO dto = null; // 결과 메시지 구조
+
+        try {
+            String userId = CmmUtil.nvl(request.getParameter("userId")); // 글번호(PK)
+
+            /*
+             * ####################################################################################
+             * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
+             * ####################################################################################
+             */
+            log.info("userId : " + userId);
+
+            /*
+             * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
+             */
+            UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
+
+            userInfoService.deleteUserInfo(pDTO);
+
+            msg = "탈퇴되었습니다. 이용해주셔서 감사합니다";
+
+        } catch (Exception e) {
+            msg = "실패하였습니다. : " + e.getMessage();
+            log.info(e.toString());
+            e.printStackTrace();
+
+        } finally {
+
+            // 결과 메시지 전달하기
+            dto = MsgDTO.builder().msg(msg).build();
+
+            log.info(this.getClass().getName() + ".UserInfoDelete End!");
+
+        }
+
+        return dto;
+    }
 
     @ResponseBody
     @PostMapping(value = "searchPasswordProc")
@@ -376,62 +379,18 @@ public class UserInfoController {
         return dto;
     }
 
+    @GetMapping(value = "newPassword2")
+    public String newPassword2(ModelMap model, HttpSession session) {
+        log.info(this.getClass().getName() + ".user/searchUserId Start!");
 
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        log.info("User ID: " + userId);
 
+        log.info(this.getClass().getName() + ".user/searchUserId End!");
 
-    /**
-     * 비밀번호 찾기 로직 수행
-     * <p>
-     * 아이디, 이름, 이메일 일치하면, 비밀번호 재발급 화면 이동
-     */
-//    @PostMapping(value = "newPasswordProc")
-//    public MsgDTO newPasswordProc(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
-//        log.info(this.getClass().getName() + ".user/newPasswordProc Start!");
-//
-//        String msg = ""; // 웹에 보여줄 메시지
-//        MsgDTO dto;
-//
-//        // 세션에서 userId 받아오기
-//        String userId = (String) session.getAttribute("NEW_PASSWORD_USER_ID");
-//
-//        // 세션에서 userId가 null인지 확인
-//        if (userId == null || userId.isEmpty()) {
-//            msg = "세션이 만료되었습니다. 다시 비밀번호 찾기를 진행해주세요.";
-//            model.addAttribute("msg", msg);
-//            dto = MsgDTO.builder().msg("fail").build(); // 비밀번호를 찾지 못한 경우
-//            return dto; // 비밀번호 찾기 페이지로 이동
-//        }
-//
-//        // 새 비밀번호 받아오기
-//        String password = CmmUtil.nvl(request.getParameter("password")); // 신규 비밀번호
-//
-//        log.info("Received userId: " + userId);
-//        log.info("Received password: " + password);
-//
-//        // 신규 비밀번호를 해시로 암호화
-//        String hashedPassword = EncryptUtil.encHashSHA256(password);
-//
-//        UserInfoDTO pDTO = UserInfoDTO.builder()
-//                .userId(userId)
-//                .password(hashedPassword)
-//                .build();
-//
-//        // 서비스로 DTO 전달
-//        userInfoService.newPasswordProc(pDTO);
-//
-//        // 비밀번호 재생성하는 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
-//        session.setAttribute("NEW_PASSWORD", "");
-//        session.removeAttribute("NEW_PASSWORD");
-//
-//        msg = "비밀번호가 재설정되었습니다.";
-//
-//        model.addAttribute("msg", msg);
-//        dto = MsgDTO.builder().msg("success").build(); // 성공적으로 비밀번호를 찾은 경우
-//        log.info(this.getClass().getName() + ".user/newPasswordProc End!");
-//
-//        log.info("dto : " + dto);
-//        return dto;
-//    }
+        return "user/newPassword2";
+    }
+
 
     @PostMapping(value = "/newPasswordProc", produces = "application/json; charset=UTF-8")
     @ResponseBody

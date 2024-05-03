@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    
     <title>회원정보 프로필</title>
     <style>
         body {
@@ -19,6 +14,7 @@
             max-width: 600px;
             margin: 0 auto;
         }
+        /* 프로필 아이콘 스타일 */
         .profile-icon {
             width: 150px;
             height: 150px;
@@ -30,57 +26,150 @@
             color: #666;
             margin-bottom: 20px;
         }
-        label {
-            font-weight: bold;
-        }
+        /* 입력 필드 스타일 */
         input[type="text"],
         input[type="email"],
         input[type="tel"] {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
-            pointer-events: none;
             background-color: #f0f0f0;
         }
-        select {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            pointer-events: none;
-            background-color: #f0f0f0;
-        }
+        /* 버튼 스타일 */
         button {
             padding: 10px 20px;
             background-color: #007bff;
             color: #fff;
             border: none;
             border-radius: 4px;
-            cursor: not-allowed;
+            margin-right: 10px;
+        }
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        /* 모달 콘텐츠 스타일 */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+        }
+        /* 모달 닫기 버튼 스타일 */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        /* 모달 닫기 버튼 호버 스타일 */
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- 프로필 정보 -->
     <div class="profile-icon">👤</div>
     <label for="userId">아이디</label>
-    <input type="text" id="userId" name="userId" value="홍길동" readonly>
+    <input type="text" id="userId" name="userId" th:value="${rList[0].userId}" readonly>
     <label for="userName">이름</label>
-    <input type="text" id="userName" name="userName" value="홍길동" readonly>
+    <input type="text" id="userName" name="userName" th:value="${rList[0].userName}" readonly>
     <label for="email">이메일</label>
-    <input type="email" id="email" name="email" value="example@example.com" readonly>
+    <input type="email" id="email" name="email" th:value="${rList[0].email}" readonly>
 
+    <!-- 추가 정보 -->
     <h2>추가 정보</h2>
     <label for="addr1">거주지</label>
-    <input type="text" id="addr1" name="addr1" value="서울" readonly>
+    <input type="text" id="addr1" name="addr1" th:value="${rList[0].addr1}" readonly>
     <label for="addr2">상세주소</label>
-    <input type="text" id="addr2" name="addr2" value="서울" readonly>
+    <input type="text" id="addr2" name="addr2" th:value="${rList[0].addr2}" readonly>
     <label for="genre">장르</label>
-    <input type="text" id="genre" name="genre" value="서울" readonly>
-    
-    
-    <button type="button" disabled>비밀번호 변경</button>
-    <button type="button" disabled>프로필 수정</button>
-    <button type="button" disabled>계정 삭제</button>
+    <input type="text" id="genre" name="genre" th:value="${rList[0].genre}" readonly>
+
+    <!-- 계정 삭제 버튼 -->
+    <button id="update" type="button">회원정보 수정</button>
+    <button id="btnupdate" type="button" onclick="window.location.href='/user/newPassword2'">비밀번호 변경</button>
+    <button id="deleteBtn" type="button">계정 삭제</button>
+
+    <!-- 계정 삭제 모달 -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div>계정을 삭제하시겠습니까? 삭제하시려면 '탈퇴합니다'를 입력하세요.</div>
+            <input id="confirmInput" type="text" placeholder="탈퇴합니다.">
+            <button id="confirmBtn" type="button">삭제</button>
+        </div>
+    </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    var deleteModal = document.getElementById('deleteModal');
+    var confirmInput = document.getElementById('confirmInput');
+    var confirmBtn = document.getElementById('confirmBtn');
+    var deleteBtn = document.getElementById('deleteBtn');
+    var closeBtn = document.getElementsByClassName('close')[0];
+
+    // 모달 열기
+    deleteBtn.onclick = function() {
+        deleteModal.style.display = "block";
+    }
+
+    // 모달 닫기
+    closeBtn.onclick = function() {
+        deleteModal.style.display = "none";
+    }
+
+    // 모달 외부 클릭 시 닫기
+    window.onclick = function(event) {
+        if (event.target == deleteModal) {
+            deleteModal.style.display = "none";
+        }
+    }
+
+    // 계정 삭제 버튼 클릭 시 확인
+    var userId = $("#userId").val(); // userId 값을 가져옵니다.
+
+    // 계정 삭제 버튼 클릭 시 확인
+    confirmBtn.onclick = function() {
+        var confirmText = confirmInput.value;
+        if (confirmText === "탈퇴합니다") {
+            // AJAX 요청 보내기
+            $.ajax({
+                url: "/user/userDelete",
+                type: "POST",
+                dataType: "JSON",
+                data: {"userId": userId}, // userId 값을 전송합니다.
+                success: function (json) {
+                    alert(json.msg);
+                    // 페이지 새로고침
+                    location.href = "/main/index";
+                },
+                error: function (xhr, status, error) {
+                    alert("에러가 발생했습니다. 다시 시도해주세요.");
+                }
+            });
+        } else {
+            alert("올바른 입력을 하십시오.");
+        }
+    }
+
+</script>
 </body>
 </html>
+

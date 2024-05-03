@@ -36,16 +36,17 @@ public class UserInfoService implements IUserInfoService {
     public List<UserInfoDTO> getUserList(String userId) {
         log.info("Fetching data for user: {}", userId);
 
-        List<UserInfoEntity> rList = userInfoRepository.findAllByUserIdOrderByCalendarSeqDesc(userId);
+        List<UserInfoEntity> rList = userInfoRepository.findAllByUserIdOrderByUserIdDesc(userId);
 
         List<UserInfoDTO> nList = rList.stream()
-                .map(UserInfoEntity -> UserInfoDTO.builder()
-                        .userId(userinfoEntity.getuserId())
-                        .title(calendarEntity.getTitle())
-                        .userId(calendarEntity.getUserId())
-                        .start(calendarEntity.getStart())
-                        .end(calendarEntity.getEnd())
-                        .description(calendarEntity.getDescription())
+                .map(userInfoEntity -> UserInfoDTO.builder()
+                        .userId(userInfoEntity.getUserId())
+                        .password(userInfoEntity.getPassword())
+                        .addr1(userInfoEntity.getAddr1())
+                        .addr2(userInfoEntity.getAddr2())
+                        .userName(userInfoEntity.getUserName())
+                        .email(userInfoEntity.getEmail())
+                        .genre(userInfoEntity.getGenre())
                         .build())
                 .collect(Collectors.toList());
 
@@ -53,6 +54,7 @@ public class UserInfoService implements IUserInfoService {
 
         return nList;
     }
+
     // 아이디 중복체크
     @Override
     public UserInfoDTO getUserIdExists(UserInfoDTO pDTO) throws Exception {

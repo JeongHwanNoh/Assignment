@@ -17,7 +17,8 @@ public interface UserInfoRepository extends JpaRepository<UserInfoEntity, String
     Optional<UserInfoEntity> findByUserIdAndPassword(String userId, String password);
 
 
-    List<UserInfoEntity> findAllByOrderByUserIdDesc();
+    List<UserInfoEntity> findAllByUserIdOrderByUserIdDesc(String userId);
+
 
     Optional<UserInfoEntity> findByUserIdAndUserNameAndEmail(String userId, String email, String userName);
     // 아이디 찾기
