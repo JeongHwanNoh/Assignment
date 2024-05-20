@@ -316,52 +316,6 @@ public class UserInfoService implements IUserInfoService {
 
 
 
-//    @Transactional
-//    @Override
-//    public void newPasswordProc(UserInfoDTO pDTO) throws Exception {
-//
-//        log.info(this.getClass().getName() + ".newPasswordProc start!");
-//
-//        String userId = CmmUtil.nvl(pDTO.userId());
-//
-//        log.info("userId : " + userId);
-//
-//
-//        // 사용자 ID로 사용자 엔티티 조회
-//        // Select *
-//        // Froe 컬렉션
-//        // where UserId = (userId)
-//        Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
-//
-//        if (uEntity.isPresent()) {
-//
-//            UserInfoEntity rEntity = uEntity.get();
-//
-//            log.info("rEntity userId : " + rEntity.getUserId());
-//            log.info("rEntity password : " + rEntity.getPassword());
-//            log.info("rEntity userName : " + rEntity.getUserName());
-//            log.info("rEntity email : " + rEntity.getEmail());
-//            log.info("rEntity addr1 : " + rEntity.getAddr1());
-//            log.info("rEntity addr2 : " + rEntity.getAddr2());
-//
-//            UserInfoEntity pEntity = UserInfoEntity.builder()
-//                    .userId(rEntity.getUserId()).userName(rEntity.getUserName())
-//                    .password(pDTO.password())
-//                    .email(rEntity.getEmail())
-//                    .regId(rEntity.getUserId()).regDt(rEntity.getRegDt())
-//                    .chgId(rEntity.getUserId()).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
-//                    .gender(rEntity.getGender()) // 추가적인 필드
-//                    .genre(rEntity.getGenre())  // 추가적인 필드
-//                    .build();
-//
-//            userInfoRepository.save(pEntity);
-//
-//            log.info("확인");
-//
-//        }
-//
-//        log.info(this.getClass().getName() + ".newPasswordProc End!");
-//    }
 
 
     @Override

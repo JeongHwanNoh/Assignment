@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>네이버 책 검색</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input[type="text"] {
+      width: 300px;
+      padding: 10px;
+      margin-right: 10px;
+    }
+    input[type="button"] {
+      padding: 10px;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    .book {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+  </style>
+</head>
+<body>
+<h1>네이버 책 검색</h1>
+<input type="text" id="query" placeholder="검색어를 입력하세요">
+<input type="button" value="검색" onclick="searchBooks()">
+<div id="results"></div>
+
+<script>
+  function searchBooks() {
+    const query = $('#query').val();
+    if (!query) {
+      alert('검색어를 입력하세요');
+      return;
+    }
+
+    $.ajax({
+      url: 'https://openapi.naver.com/v1/search/book.json',
+      type: 'GET',
+      data: { query: query },
+      success: function(data) {
+        console.log('Success:', data);
+        displayResults(data);
+      },
+      error: function(xhr, status, error) {
+        console.error('Error:', xhr.responseText);
+        alert(`Error: ${xhr.responseText}`);
+      }
+    });
+  }
+
+  function displayResults(data) {
+    const results = $('#results');
+    results.empty();
+
+    // 책 목록을 가져옴
+    const books = data.items;
+
+    if (books.length === 0) {
+      results.append('<p>검색 결과가 없습니다.</p>');
+    } else {
+      books.forEach(book => {
+        const bookHtml = `
+          <div class="book">
+            <h3>${book.title}</h3>
+            <p>저자: ${book.author}</p>
+            <p>출판사: ${book.publisher}</p>
+            <p>출판일: ${book.pubdate}</p>
+            <p><a href="${book.link}" target="_blank">더보기</a></p>
+          </div>
+        `;
+        results.append(bookHtml);
+      });
+    }
+  }
+</script>
+</body>
+</html>
