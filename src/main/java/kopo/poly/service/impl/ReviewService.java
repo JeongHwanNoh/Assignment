@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kopo.poly.dto.NoticeDTO;
 import kopo.poly.dto.ReviewDTO;
 import kopo.poly.repository.NoticeRepository;
+import kopo.poly.repository.ReviewRepository;
 import kopo.poly.repository.entity.NoticeEntity;
 import kopo.poly.repository.entity.ReviewEntity;
 import kopo.poly.repository.entity.UserInfoEntity;
@@ -28,10 +29,10 @@ public class ReviewService implements IReviewService {
     // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
     // noticeRepository 변수에 이미 메모리에 올라간 NoticeRepository 객체를 넣어줌
     // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
-    private final NoticeRepository noticeRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
-    public List<NoticeDTO> getReviewList() {
+    public List<ReviewDTO> getReviewList() {
 
         log.info(this.getClass().getName() + ".getReviewList Start!");
 
@@ -95,60 +96,64 @@ public class ReviewService implements IReviewService {
 
         // 수정할 값들을 빌더를 통해 엔티티에 저장하기
         ReviewEntity pEntity = ReviewEntity.builder()
-                .reviewSeq(reviewSeq).title(title).contents(contents).userId(userId).userName()
-                .readCnt(rEntity.getReadCnt())
+                .reviewSeq(reviewSeq).title(title).contents(contents).userId(userId).rating(rating)
+                .author(author).imageUrl(imageUrl).regDt(regDt)
                 .build();
 
         // 데이터 수정하기
-        noticeRepository.save(pEntity);
+        reviewRepository.save(pEntity);
 
         log.info(this.getClass().getName() + ".updateReviewInfo End!");
 
     }
 
     @Override
-    public void deleteNoticeInfo(NoticeDTO pDTO) throws Exception {
+    public void deleteReviewInfo(ReviewDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".deleteNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".deleteReviewInfo Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long reviewSeq = pDTO.reviewSeq();
 
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("reviewSeq : " + reviewSeq);
 
         // 데이터 수정하기
-        noticeRepository.deleteById(noticeSeq);
+        reviewRepository.deleteById(reviewSeq);
 
 
-        log.info(this.getClass().getName() + ".deleteNoticeInfo End!");
+        log.info(this.getClass().getName() + ".deleteReviewInfo End!");
     }
 
     @Override
-    public void insertNoticeInfo(NoticeDTO pDTO) throws Exception {
+    public void insertReviewInfo(ReviewDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".InsertNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".InsertReviewInfo Start!");
 
+        String rating = CmmUtil.nvl(pDTO.rating());
+        String author = CmmUtil.nvl(pDTO.author());
+        String imageUrl = CmmUtil.nvl(pDTO.image_url());
         String title = CmmUtil.nvl(pDTO.title());
         String contents = CmmUtil.nvl(pDTO.contents());
         String userId = CmmUtil.nvl(pDTO.userId());
-        String userName = CmmUtil.nvl(pDTO.userName());
 
         log.info("title : " + title);
         log.info("contents : " + contents);
         log.info("userId : " + userId);
-        log.info("userName : " + userName);
+        log.info("imageUrl : " + imageUrl);
+        log.info("author : " + author);
+        log.info("rating : " + rating);
 
         // 공지사항 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
         // JPA에 자동 증가 설정을 해놨음
-        NoticeEntity pEntity = NoticeEntity.builder()
-                .title(title).contents(contents).userId(userId).userName(userName).readCnt(0L)
-                .regId(userId).regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
-                .chgId(userId).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
+        ReviewEntity pEntity = ReviewEntity.builder()
+                .title(title).contents(contents).userId(userId).imageUrl(imageUrl).author(author)
+                .rating(rating)
+                .regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .build();
 
         // 공지사항 저장하기
-        noticeRepository.save(pEntity);
+        reviewRepository.save(pEntity);
 
-        log.info(this.getClass().getName() + ".InsertNoticeInfo End!");
+        log.info(this.getClass().getName() + ".InsertReviewInfo End!");
 
     }
 }

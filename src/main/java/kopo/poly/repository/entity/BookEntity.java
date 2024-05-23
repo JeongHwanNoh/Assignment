@@ -8,22 +8,22 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Review")
+@Table(name = "BOOK")
 @DynamicInsert
 @DynamicUpdate
 @Builder
 @Entity
 
 
-public class ReviewEntity {
+public class BookEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_seq")
-    private Long reviewSeq;
+    @Column(name = "user_id")
+    private String userId;
 
     @NonNull
-    @Column(name = "title", length = 500, nullable = false)
+    @Column(name = "title", length = 100, nullable = false)
     private String title;
 
     @NonNull
@@ -31,29 +31,15 @@ public class ReviewEntity {
     private String author;
 
     @NonNull
-    @Column(name = "image_url", length = 500, nullable = false)
+    @Column(name = "image_url", length = 100, nullable = false)
     private String imageUrl;
 
     @NonNull
-    @Column(name = "user_id", nullable = false)
-    private String userId;
-
-    @NonNull
-    @Column(name = "contents", length = 2000, nullable = false)
-    private String contents;
-
-    @NonNull
-    @Column(name = "rating", nullable = false)
-    private String rating;
-
-    @NonNull
-    @Column(name = "reg_dt", nullable = false)
-    private String regDt;
+    @Column(name = "description", length = 2000, nullable = false)
+    private String description;
 
     @OneToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserInfoEntity userInfoEntity;
-
-
 
 }

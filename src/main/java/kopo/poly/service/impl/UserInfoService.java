@@ -18,9 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,18 +38,30 @@ public class UserInfoService implements IUserInfoService {
     public List<UserInfoDTO> getUserList(String userId) {
         log.info("Fetching data for user: {}", userId);
 
+        // 사용자 정보 엔티티 리스트 가져오기
         List<UserInfoEntity> rList = userInfoRepository.findAllByUserIdOrderByUserIdDesc(userId);
 
+        // 복호화된 사용자 정보 DTO 리스트 생성
         List<UserInfoDTO> nList = rList.stream()
-                .map(userInfoEntity -> UserInfoDTO.builder()
-                        .userId(userInfoEntity.getUserId())
-                        .password(userInfoEntity.getPassword())
-                        .addr1(userInfoEntity.getAddr1())
-                        .addr2(userInfoEntity.getAddr2())
-                        .userName(userInfoEntity.getUserName())
-                        .email(userInfoEntity.getEmail())
-                        .genre(userInfoEntity.getGenre())
-                        .build())
+                .map(userInfoEntity -> {
+                    try {
+                        // 이메일 복호화
+                        String decryptedEmail = EncryptUtil.decAES128CBC(userInfoEntity.getEmail());
+                        // UserInfoDTO 객체 생성하여 반환
+                        return UserInfoDTO.builder()
+                                .userId(userInfoEntity.getUserId())
+                                .password(userInfoEntity.getPassword())
+                                .addr1(userInfoEntity.getAddr1())
+                                .addr2(userInfoEntity.getAddr2())
+                                .userName(userInfoEntity.getUserName())
+                                .email(decryptedEmail) // 복호화된 이메일 설정
+                                .genre(userInfoEntity.getGenre())
+                                .build();
+                    } catch (Exception e) {
+                        log.error("Error decrypting email for user: {}", userId, e);
+                        return null; // 복호화에 실패한 경우 null 반환
+                    }
+                })
                 .collect(Collectors.toList());
 
         log.info("Calendar data fetched successfully for user: {}", userId);
@@ -322,34 +336,48 @@ public class UserInfoService implements IUserInfoService {
     public void updateUserInfo(UserInfoDTO pDTO) throws Exception {
         log.info(this.getClass().getName() + ".updateUserInfo Start!");
 
-        String userId = pDTO.userId();
+        String userId = CmmUtil.nvl(pDTO.userId());
 
-        String userName = CmmUtil.nvl(pDTO.userName());
-        String addr1 = CmmUtil.nvl(pDTO.addr1());
-        String addr2 = CmmUtil.nvl(pDTO.addr2());
-        String password = CmmUtil.nvl(pDTO.password());
-        String email = CmmUtil.nvl(pDTO.email());
-        String genre = CmmUtil.nvl(pDTO.genre());
-        String gender = CmmUtil.nvl(pDTO.gender());
+        log.info("userId : " + userId);
 
-        log.info("userName : " + userName);
-        log.info("addr1 : " + addr1);
-        log.info("noticeYn : " + addr2);
-        log.info("email : " + email);
-        log.info("genre : " + genre);
-        log.info("gender : " + gender);
-        log.info("password : " + password);
+        Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
 
-        // 수정할 값들을 빌더를 통해 엔티티에 저장하기
-        UserInfoEntity pEntity = UserInfoEntity.builder()
-                .userId(userId).addr1(addr1).addr2(addr2).email(email).genre(genre)
-                .password(pDTO.password())
-                .build();
+        if (uEntity.isPresent()) {
+            UserInfoEntity rEntity = uEntity.get();
 
-        // 데이터 수정하기
-        userInfoRepository.save(pEntity);
+            log.info("rEntity userId : " + rEntity.getUserId());
+            log.info("rEntity password : " + rEntity.getPassword());
+            log.info("rEntity userName : " + rEntity.getUserName());
+            log.info("rEntity email : " + rEntity.getEmail());
+            log.info("rEntity addr1 : " + rEntity.getAddr1());
+            log.info("rEntity addr2 : " + rEntity.getAddr2());
 
+            UserInfoEntity pEntity = UserInfoEntity.builder()
+                    .userId(rEntity.getUserId())
+                    .userName(pDTO.userName() != null ? pDTO.userName() : rEntity.getUserName())
+                    .password(pDTO.password() != null ? pDTO.password() : rEntity.getPassword()) // 수정된 부분
+                    .email(pDTO.email() != null ? pDTO.email() : rEntity.getEmail())
+                    .addr1(pDTO.addr1() != null ? pDTO.addr1() : rEntity.getAddr1())
+                    .addr2(pDTO.addr2() != null ? pDTO.addr2() : rEntity.getAddr2())
+                    .regId(rEntity.getRegId())
+                    .regDt(rEntity.getRegDt())
+                    .chgId(rEntity.getUserId())
+                    .chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
+                    .genre(pDTO.genre() != null ? pDTO.genre() : rEntity.getGenre())
+                    .build();
+
+            log.info("Building pEntity with addr1: " + pEntity.getAddr1() + ", addr2: " + pEntity.getAddr2());
+
+            userInfoRepository.save(pEntity);
+
+            log.info("User info updated in database.");
+        } else {
+            log.info("No user found with userId: " + userId);
+        }
+
+        log.info(this.getClass().getName() + ".updateUserInfo End!");
     }
+
 
     @Override
     public void deleteUserInfo(UserInfoDTO pDTO) throws Exception {

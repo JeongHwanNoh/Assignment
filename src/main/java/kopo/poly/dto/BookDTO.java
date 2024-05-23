@@ -11,7 +11,7 @@ public record BookDTO(
         String title,
         String author,
         String description,
-        String image_url
+        String imageUrl
 
 ) {
 }

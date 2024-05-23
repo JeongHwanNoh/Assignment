@@ -168,20 +168,27 @@ public class UserInfoController {
     }
 
     @GetMapping(value = "mypage")
-    public String mypage(HttpSession session, ModelMap model) {
+    public String mypage(HttpSession session, ModelMap model, HttpServletRequest request) {
         log.info(this.getClass().getName() + ".user/mypage Start!");
 
         log.info("Fetching calendar data from the database...");
 
         // 세션에서 사용자 아이디 가져오기
         String userId = (String) session.getAttribute("SS_USER_ID");
+
+        String SS_USER_ID = (String) session.getAttribute("SS_USER_ID");
+
         log.info("User ID: " + userId);
 
+
+        // 사용자 정보 리스트 가져오기
         List<UserInfoDTO> rList = Optional.ofNullable(userInfoService.getUserList(userId))
                 .orElseGet(ArrayList::new);
 
 
-        // 조회된 리스트 결과값 넣어주기
+
+        model.addAttribute("SS_USER_ID", SS_USER_ID);
+        // 모델에 복호화된 사용자 정보 리스트 추가
         model.addAttribute("rList", rList);
 
         log.info("확인" + rList);
@@ -190,6 +197,37 @@ public class UserInfoController {
 
         return "user/mypage";
     }
+
+    @GetMapping(value = "mypage2")
+    public String mypage2(HttpSession session, ModelMap model, HttpServletRequest request) {
+
+
+        log.info("Fetching calendar data from the database...");
+
+        // 세션에서 사용자 아이디 가져오기
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        log.info("User ID: " + userId);
+
+
+        // 사용자 정보 리스트 가져오기
+        List<UserInfoDTO> rList = Optional.ofNullable(userInfoService.getUserList(userId))
+                .orElseGet(ArrayList::new);
+
+
+
+        // 모델에 복호화된 사용자 정보 리스트 추가
+        model.addAttribute("rList", rList);
+
+        log.info("확인" + rList);
+
+        log.info(this.getClass().getName() + ".user/mypage2 End!");
+
+        return "user/mypage2";
+    }
+
+
+
 
 
     @GetMapping(value = "newPassword")
@@ -437,6 +475,65 @@ public class UserInfoController {
         log.info("dto : " + dto);
         return dto;
     }
+
+    @ResponseBody
+    @PostMapping(value = "userUpdate")
+    public MsgDTO userUpdate(HttpSession session, HttpServletRequest request) {
+
+        log.info(this.getClass().getName() + ".userUpdate Start!");
+
+        String msg = ""; // 메시지 내용
+        MsgDTO dto = null; // 결과 메시지 구조
+
+        try {
+            String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")); // 아이디
+            String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
+            String addr1 = CmmUtil.nvl(request.getParameter("addr1")); // 거주지
+            String addr2 = CmmUtil.nvl(request.getParameter("addr2")); // 상세주소
+            String userName = CmmUtil.nvl(request.getParameter("userName")); // 이름
+            String genre = CmmUtil.nvl(request.getParameter("genre")); // 장르
+            String password = CmmUtil.nvl(request.getParameter("password")); // 비밀번호 (추가)
+
+            log.info("userId : " + userId);
+            log.info("email : " + email);
+            log.info("addr1 : " + addr1);
+            log.info("addr2 : " + addr2);
+            log.info("userName : " + userName);
+            log.info("genre : " + genre);
+            log.info("password : " + password);
+
+            // 값 전달은 반드시 DTO 객체를 이용해서 처리함
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .addr1(addr1)
+                    .addr2(addr2)
+                    .userName(userName)
+                    .email(EncryptUtil.encAES128CBC(email))
+                    .password(EncryptUtil.encHashSHA256(password)) // 비밀번호 설정 (추가)
+                    .genre(genre)
+                    .build();
+
+            // 게시글 수정하기 DB
+            userInfoService.updateUserInfo(pDTO);
+
+            msg = "수정되었습니다.";
+
+        } catch (Exception e) {
+            msg = "실패하였습니다. : " + e.getMessage();
+            log.info(e.toString());
+            e.printStackTrace();
+
+        } finally {
+            // 결과 메시지 전달하기
+            dto = MsgDTO.builder().msg(msg).build();
+
+            log.info(this.getClass().getName() + ".userUpdate End!");
+
+        }
+
+        return dto;
+    }
+
 
 
 

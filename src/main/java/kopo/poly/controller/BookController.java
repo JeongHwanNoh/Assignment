@@ -1,11 +1,14 @@
 package kopo.poly.controller;
 
 
+import kopo.poly.dto.BookDTO;
+import kopo.poly.service.IBookService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,26 +26,26 @@ import java.util.Optional;
  * 스프링 프레임워크는 기본으로 logback을 채택해서 로그 처리함
  * */
 @Slf4j
-@RequestMapping(value = "/search")
 @RequiredArgsConstructor
 @Controller
+@RequestMapping("/search")
 public class BookController {
 
-    @Value("${naver.client.id}")
-    private String clientId;
+    private final IBookService bookService;
 
-    @Value("${naver.client.secret}")
-    private String clientSecret;
+    @GetMapping("/book")
+    public String searchBook(@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword, Model model) {
 
-    @GetMapping(value = "book")
-    public String booksearch() {
+        log.info(this.getClass().getName() + ".searchBook start");
 
-        log.info(this.getClass().getName() + ".Start!");
+        if (!keyword.isEmpty()) {
+            List<BookDTO> books = bookService.searchBooks(keyword);
+            model.addAttribute("books", books);
+        }
+        model.addAttribute("keyword", keyword);
 
-        log.info(this.getClass().getName() + ".End!");
+        log.info(this.getClass().getName() + ".searchBook End");
 
         return "search/book";
     }
-
 }
-
