@@ -16,10 +16,13 @@ import org.hibernate.annotations.DynamicUpdate;
 
 
 public class BookEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "book_seq")
+    private Long bookSeq;
+
+    @NonNull
+    @Column(name = "user_id", length = 100, nullable = false)
     private String userId;
 
     @NonNull
@@ -35,7 +38,7 @@ public class BookEntity {
     private String imageUrl;
 
     @NonNull
-    @Column(name = "description", length = 2000, nullable = false)
+    @Column(name = "description", length = 1000, nullable = false)
     private String description;
 
     @OneToOne

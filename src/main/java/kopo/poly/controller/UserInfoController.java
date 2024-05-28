@@ -429,6 +429,48 @@ public class UserInfoController {
         return "user/newPassword2";
     }
 
+    @ResponseBody
+    @PostMapping(value = "newPassword2Proc")
+    public MsgDTO newPassword2proc(HttpSession session, HttpServletRequest request) {
+        log.info(this.getClass().getName() + ".userUpdate Start!");
+
+        String msg = ""; // 메시지 내용
+        MsgDTO dto = null; // 결과 메시지 구조
+
+        try {
+            String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")); // 아이디
+            String password = CmmUtil.nvl(request.getParameter("password")); // 비밀번호 (추가)
+
+            log.info("userId : " + userId);
+            log.info("password : " + password);
+
+            // 값 전달은 반드시 DTO 객체를 이용해서 처리함
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .password(EncryptUtil.encHashSHA256(password)) // 비밀번호 설정 (추가)
+                    .build();
+
+            // 게시글 수정하기 DB
+            userInfoService.updateUserInfo(pDTO);
+
+            msg = "수정되었습니다.";
+
+        } catch (Exception e) {
+            msg = "실패하였습니다. : " + e.getMessage();
+            log.info(e.toString());
+            e.printStackTrace();
+
+        } finally {
+            // 결과 메시지 전달하기
+            dto = MsgDTO.builder().msg(msg).build();
+
+            log.info(this.getClass().getName() + ".userUpdate End!");
+        }
+
+        return dto;
+    }
+
+
 
     @PostMapping(value = "/newPasswordProc", produces = "application/json; charset=UTF-8")
     @ResponseBody

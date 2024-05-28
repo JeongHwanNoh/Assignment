@@ -1,31 +1,122 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Search Books</title>
+  <title>책 검색</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    input[type="text"] {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .results {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .results h2 {
+      color: #333;
+      margin-top: 0;
+    }
+
+    .results ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .results li {
+      display: flex;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .results li:last-child {
+      border-bottom: none;
+    }
+
+    .results img {
+      margin-right: 20px;
+      border-radius: 4px;
+    }
+
+    .results .details {
+      max-width: calc(100% - 120px);
+    }
+
+    .results .details span {
+      display: block;
+      margin-bottom: 5px;
+    }
+  </style>
 </head>
 <body>
-<h1>Book Search</h1>
+<h1>책 검색</h1>
 <form action="/search/book" method="get">
-  <input type="text" name="keyword" value="">
-  <button type="submit">Search</button>
+  <input type="text" name="keyword" placeholder="검색어 입력">
+  <button type="submit">검색</button>
 </form>
-<hr>
-<h2>Search Results</h2>
-<ul>
-  <!-- 검색 결과 표시 -->
-  <#if books?has_content>
-  <#list books as book>
-  <li>
-    <img src="${book.imageUrl}" alt="${book.title}">
-    <p><strong>${book.title}</strong> - ${book.author}</p>
-    <p>${book.description}</p>
-  </li>
-</#list>
-<#else>
-<p>No books found.</p>
-</#if>
-</ul>
+
+<div class="results">
+  <h2>검색 결과</h2>
+  <div th:if="${not #lists.isEmpty(books)}">
+    <ul>
+      <li th:each="book : ${books}">
+        <a th:href="@{/search/detail(title=${book.title})}">
+          <img th:src="${book.imageUrl}" th:alt="${book.title}" style="width: 100px; height: auto;">
+        </a>
+        <div class="details">
+          <span>제목: <strong th:text="${book.title}"></strong></span>
+          <span>저자: <strong th:text="${book.author}"></strong></span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div th:if="${#lists.isEmpty(books)} and ${keyword != ''}">
+    <p>검색 결과가 없습니다.</p>
+  </div>
+</div>
 </body>
 </html>

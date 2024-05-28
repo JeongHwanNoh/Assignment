@@ -328,8 +328,49 @@ public class UserInfoService implements IUserInfoService {
         log.info(this.getClass().getName() + ".newPasswordProc End!");
     }
 
+    @Override
+    public void newPassword2Proc(UserInfoDTO pDTO) throws Exception {
+        log.info(this.getClass().getName() + ".updateUserInfo Start!");
 
+        String userId = CmmUtil.nvl(pDTO.userId());
 
+        log.info("userId : " + userId);
+
+        Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
+
+        if (uEntity.isPresent()) {
+            UserInfoEntity rEntity = uEntity.get();
+
+            log.info("rEntity userId : " + rEntity.getUserId());
+            log.info("rEntity password : " + rEntity.getPassword());
+            log.info("rEntity userName : " + rEntity.getUserName());
+            log.info("rEntity email : " + rEntity.getEmail());
+            log.info("rEntity addr1 : " + rEntity.getAddr1());
+            log.info("rEntity addr2 : " + rEntity.getAddr2());
+
+            UserInfoEntity pEntity = UserInfoEntity.builder()
+                    .userId(rEntity.getUserId())
+                    .userName(pDTO.userName() != null ? pDTO.userName() : rEntity.getUserName())
+                    .password(pDTO.password() != null ? pDTO.password() : rEntity.getPassword()) // 수정된 부분
+                    .email(pDTO.email() != null ? pDTO.email() : rEntity.getEmail())
+                    .addr1(pDTO.addr1() != null ? pDTO.addr1() : rEntity.getAddr1())
+                    .addr2(pDTO.addr2() != null ? pDTO.addr2() : rEntity.getAddr2())
+                    .regId(rEntity.getRegId())
+                    .regDt(rEntity.getRegDt())
+                    .chgId(rEntity.getUserId())
+                    .chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
+                    .genre(pDTO.genre() != null ? pDTO.genre() : rEntity.getGenre())
+                    .build();
+
+            userInfoRepository.save(pEntity);
+
+            log.info("User info updated in database.");
+        } else {
+            log.info("No user found with userId: " + userId);
+        }
+
+        log.info(this.getClass().getName() + ".updateUserInfo End!");
+    }
 
 
     @Override

@@ -198,8 +198,6 @@
             <label for="email">이메일</label>
             <input type="email" id="email" name="email" th:value="${rList[0].email}">
 
-            <!-- 추가 정보 -->
-            <h2>추가 정보</h2>
             <label for="addr1">거주지</label>
             <div class="address-container">
                 <input type="text" id="addr1" name="addr1" th:value="${rList[0].addr1}">
@@ -212,7 +210,12 @@
 
             <button id="update" type="button">수정</button>
             <button id="cancel" type="button">취소</button>
-        </div>
+
+            <script type="text/javascript">
+                document.getElementById("cancel").onclick = function() {
+                    window.location.href = "/user/mypage";
+                };
+            </script>
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
