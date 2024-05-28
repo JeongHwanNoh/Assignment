@@ -79,11 +79,6 @@
             displayButtons(isLoggedIn);
         });
 
-
-        function doDetail(seq) {
-            location.href = "/notice/noticeInfo?nSeq=" + seq;
-        }
-
     </script>
 
 </head>
@@ -102,12 +97,11 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
                     <li class="nav-item"><a class="nav-link" href="/calendar/info">일정</a></li>
-                    <li class="nav-item"><a class="nav-link" href="book">도서</a></li>
-                    <li class="nav-item"><a class="nav-link" href="plan">목표</a></li>
-                    <li class="nav-item"><a class="nav-link" href="search">도서관 찾기</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/search/book">도서</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/review/reviewList">목표</a></li>
                     <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
                     <li class="nav-item"><a id="reButton" class="nav-link" href="/user/userRegForm">회원가입</a></li>
-                    <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/login">마이페이지</a></li>
+                    <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/mypage">마이페이지</a></li>
                     <li class="nav-item"><a id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
                 </ul>
             </div>
@@ -160,8 +154,8 @@
 
                 .map_wrap {
                     position: relative;
-                    width: 80%; /* 예시로 80%의 가로 길이를 지정합니다. 필요에 따라 조절하세요. */
-                    height: 700px; /* 예시로 700px의 세로 길이를 지정합니다. 필요에 따라 조절하세요. */
+                    width: 50%; /* 예시로 80%의 가로 길이를 지정합니다. 필요에 따라 조절하세요. */
+                    height: 500px; /* 예시로 700px의 세로 길이를 지정합니다. 필요에 따라 조절하세요. */
                     margin: 0 auto; /* 가운데 정렬을 위해 추가합니다. */
                     overflow: hidden;
                 }

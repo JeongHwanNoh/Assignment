@@ -10,6 +10,8 @@ public interface IReviewService {
     /**
      * 공지사항 전체 가져오기
      */
+    List<ReviewDTO> searchBooks(String searchKeyword);
+
     List<ReviewDTO> getReviewList();
 
     /**

@@ -101,6 +101,7 @@ public class UserInfoController {
                 .password(EncryptUtil.encHashSHA256(password))
                 .email(EncryptUtil.encAES128CBC(email))
                 .addr1(addr1)
+                .addr1(addr1)
                 .addr2(addr2)
                 .regId(userId)
                 .chgId(userId)

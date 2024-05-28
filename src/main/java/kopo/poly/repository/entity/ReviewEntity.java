@@ -8,7 +8,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Review")
+@Table(name = "REVIEW")
 @DynamicInsert
 @DynamicUpdate
 @Builder
@@ -44,15 +44,15 @@ public class ReviewEntity {
 
     @NonNull
     @Column(name = "rating", nullable = false)
-    private String rating;
+    private Long rating;
 
     @NonNull
     @Column(name = "reg_dt", nullable = false)
     private String regDt;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    private UserInfoEntity userInfoEntity;
+//    @OneToOne
+//    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+//    private UserInfoEntity userInfoEntity;
 
 
 

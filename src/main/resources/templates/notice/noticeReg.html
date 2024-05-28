@@ -10,7 +10,7 @@
             margin: 0 auto;
         }
 
-        table {
+        .btn-real {
             border-collapse: collapse;
             width: 50%; /* 조금 줄였습니다 */
             margin: 20px auto;
@@ -147,7 +147,7 @@
 <body>
 <br/>
 <form name="f" id="f">
-    <table>
+    <div class="btn-real">
         <tr>
             <th>제목</th>
             <td><input type="text" name="title" maxlength="100"/></td>
@@ -156,7 +156,7 @@
             <th>내용</th>
             <td><textarea name="contents" style="height: 400px"></textarea></td>
         </tr>
-    </table>
+    </div>
     <div class="btn-group">
         <button id="btnSend" type="button">등록</button>
         <button type="reset">다시 작성</button>

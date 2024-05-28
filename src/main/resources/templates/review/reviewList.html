@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독후감 리스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .review-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 250px;
+            box-sizing: border-box;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .review-card:hover {
+            transform: scale(1.05);
+        }
+
+        .review-card img {
+            border-radius: 8px;
+            width: 150px;
+            height: auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .review-title {
+            font-size: 1.5em;
+            margin: 10px 0;
+            text-align: center; /* 가운데 정렬 */
+        }
+
+        .review-author {
+            font-size: 1.2em;
+            margin: 5px 0;
+            color: #555;
+            text-align: center; /* 가운데 정렬 */
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .star {
+            font-size: 24px;
+            color: hsl(60, 80%, 45%);
+            cursor: pointer;
+            margin: 0 2px;
+        }
+
+        .star.filled {
+            color: hsl(45, 80%, 55%);
+        }
+
+        /* 링크 스타일 */
+        .review-card a {
+            text-decoration: none;
+            color: inherit; /* 부모 요소의 색상 상속 */
+            transition: color 0.2s ease; /* 색상 변화에 부드러운 전환 효과 */
+        }
+
+        .review-card a:hover {
+            color: #007bff; /* 호버 시 색상 변경 */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div th:each="review : ${rList}" class="review-card">
+        <a th:href="'/review/reviewInfo?nSeq=' + ${review.reviewSeq}"> <!-- 상세 정보 페이지로 이동하는 링크 -->
+            <img th:src="${review.imageUrl}" alt="책 이미지">
+            <div class="review-title" th:text="${review.title}">독후감 제목</div>
+            <div class="review-author" th:text="${review.userId}">이름</div>
+            <div class="star-rating" th:data-rating="${review.rating}">
+            </div>
+            <br>
+            <div class="review-datetime" th:text="${review.regDt}">날짜</div>
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var starRatings = document.querySelectorAll('.star-rating');
+
+        starRatings.forEach(function(ratingElement) {
+            var rating = ratingElement.getAttribute('data-rating');
+            if (rating) {
+                displayRatingStars(parseInt(rating), ratingElement);
+            }
+        });
+    });
+
+    // 별점을 표시하는 함수
+    function displayRatingStars(rating, container) {
+        container.innerHTML = ''; // 이전에 생성된 요소를 지웁니다.
+        for (var i = 1; i <= 5; i++) {
+            var star = document.createElement('span');
+            star.classList.add('star');
+            star.textContent = '☆';
+            if (i <= rating) {
+                star.classList.add('filled');
+                star.textContent = '★';
+            }
+            container.appendChild(star);
+        }
+    }
+</script>
+</body>
+</html>

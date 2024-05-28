@@ -20,12 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class CalendarService implements ICalendarService {
 
-    // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
-    // noticeRepository 변수에 이미 메모리에 올라간 NoticeRepository 객체를 넣어줌
-    // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
     private final CalendarRepository calendarRepository;
 
-    // 서비스 계층의 getCalendarList 메서드 수정
     @Override
     public List<CalendarDTO> getCalendarList(String userId) {
         log.info("Fetching calendar data for user: {}", userId);
@@ -111,7 +107,7 @@ public class CalendarService implements ICalendarService {
         log.info("end : " + end);
         log.info("description : " + description);
 
-        // 공지사항 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
+
         // JPA에 자동 증가 설정을 해놨음
         CalendarEntity pEntity = CalendarEntity.builder()
                 .title(title).userId(userId).start(start).end(end).description(description)

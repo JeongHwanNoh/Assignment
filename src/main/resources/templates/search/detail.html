@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>책 상세보기</title>
-    <div class="buttons">
-        <button>찜하기</button>
-        <button onclick="window.history.back();">돌아가기</button>
-    </div>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,7 +48,7 @@
         .buttons {
             position: absolute;
             top: 20px;
-            right: 20px;
+            right: 30px;
         }
 
         .buttons button {
@@ -69,14 +65,45 @@
             background-color: #0056b3;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function addBookToWishlist() {
+            var bookData = {
+                title: $("#book-title").text(),
+                author: $("#book-author").text(),
+                imageUrl: $("#book-image").attr("src"),
+                description: $("#book-description").text()
+            };
+
+            $.ajax({
+                url: "/search/bookInsert",
+                type: "post",
+                contentType: "application/json", // JSON 데이터 전송을 명시
+                data: JSON.stringify(bookData), // bookData를 JSON 문자열로 변환하여 전송
+                dataType: "json",
+                success: function(response) {
+                    alert(response.msg);
+                    location.href = "/search/book";
+                },
+                error: function(error) {
+                    console.error("Error adding book to wishlist:", error);
+                    alert("책 찜하기에 실패했습니다.");
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 <h1>책 상세보기</h1>
 <div class="book-details">
-    <img th:src="${bookDetail.imageUrl}" th:alt="${bookDetail.title}">
-    <h2 th:text="${bookDetail.title}"></h2>
-    <p>저자: <span th:text="${bookDetail.author}"></span></p>
-    <p>설명: <span th:text="${bookDetail.description}"></span></p>
+    <img id="book-image" th:src="${bookDetail.imageUrl}" alt="${bookDetail.title}">
+    <h2 id="book-title" th:text="${bookDetail.title}"></h2>
+    <p>저자: <span id="book-author" th:text="${bookDetail.author}"></span></p>
+    <p>설명: <span id="book-description" th:text="${bookDetail.description}"></span></p>
+    <div class="buttons">
+        <button onclick="addBookToWishlist()">찜하기</button>
+        <button onclick="window.history.back();">돌아가기</button>
+    </div>
 </div>
 </body>
 </html>

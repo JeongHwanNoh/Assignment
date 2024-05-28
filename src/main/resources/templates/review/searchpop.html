@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>책 검색</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .results {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .results h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        .results ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .results li {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results li:last-child {
+            border-bottom: none;
+        }
+
+        .results img {
+            margin-right: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .results .details {
+            max-width: calc(100% - 120px);
+        }
+
+        .results .details span {
+            display: block;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+            function selectBook(element) {
+            var title = element.querySelector('.details span:first-child strong').textContent;
+            var author = element.querySelector('.details span:last-child strong').textContent;
+            var imageUrl = element.querySelector('img').getAttribute('src');
+            window.opener.setBookInfo(title, author, imageUrl);
+            window.close();
+        }
+    </script>
+</head>
+<body>
+<h1>책 검색</h1>
+<form action="/review/searchpop" method="get">
+    <input type="text" name="keyword" placeholder="검색어 입력" value="">
+    <button type="submit">검색</button>
+</form>
+
+<div class="results">
+    <h2>검색 결과</h2>
+    <ul>
+        <li th:each="book : ${books}" onclick="selectBook(this)">
+            <img th:src="${book.imageUrl}" th:alt="${book.title}" style="width: 100px; height: auto;">
+            <div class="details">
+                <span>제목: <strong th:text="${book.title}"></strong></span>
+                <span>저자: <strong th:text="${book.author}"></strong></span>
+            </div>
+        </li>
+    </ul>
+    <div th:if="${#lists.isEmpty(books)} and ${keyword != ''}">
+        <p>검색 결과가 없습니다.</p>
+    </div>
+</div>
+</body>
+</html>

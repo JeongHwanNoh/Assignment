@@ -11,9 +11,9 @@ public record ReviewDTO(
         String userId,
         String title,
         String author,
-        String rating,
+        Long rating,
         String contents,
         String regDt,
-        String image_url
+        String imageUrl
 ) {
 }
