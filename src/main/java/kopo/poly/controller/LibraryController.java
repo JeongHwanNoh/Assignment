@@ -22,7 +22,9 @@ public class LibraryController {
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".noticeList End!");
 
-        // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
+        String SS_USER_ID = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("SS_USER_ID", SS_USER_ID);
         // templates/notice/noticeList.html
         return "library/search";
     }
