@@ -36,53 +36,42 @@ public class BookController {
         List<BookDTO> rList = Optional.ofNullable(bookService.getBookList(userId))
                 .orElseGet(ArrayList::new);
 
-        String SS_USER_ID = (String) session.getAttribute("SS_USER_ID");
-
-        model.addAttribute("SS_USER_ID", SS_USER_ID);
-
-        // 조회된 리스트 결과값 넣어주기
+        model.addAttribute("SS_USER_ID", userId);
         model.addAttribute("rList", rList);
 
-        log.info("확인" + rList);
-
-        log.info("User ID: " + userId);
-
-        List<BookDTO> books = Collections.emptyList();
-
         if (!keyword.isEmpty()) {
-            books = bookService.searchBooks(keyword);
-            log.info("Keyword: " + keyword);
-            log.info("Books: " + books);
+            List<BookDTO> books = bookService.searchBooks(keyword);
+            model.addAttribute("books", books);
+            model.addAttribute("keyword", keyword);
         } else {
-            log.info("No keyword provided, skipping search.");
+            model.addAttribute("books", Collections.emptyList());
         }
 
-        model.addAttribute("books", books);
-        model.addAttribute("keyword", keyword);
-
-        log.info("Model attribute 'keyword': " + model.getAttribute("keyword"));
-        log.info("Model attribute 'books': " + model.getAttribute("books"));
-
         log.info(this.getClass().getName() + ".searchBook End");
-
-
-
         return "search/book";
     }
 
     @GetMapping("/detail")
-    public String showBookDetail(@RequestParam("title") String title, Model model) {
+    public String showBookDetail(@RequestParam("isbn") String isbn, Model model, HttpSession session) {
         log.info(this.getClass().getName() + ".showBookDetail start");
 
-        // 선택한 책의 제목을 기반으로 책 정보를 가져옴
-        BookDTO bookDetail = bookService.getBookDetail(title);
+        BookDTO bookDetail = bookService.getBookDetail(isbn);
 
-        // 가져온 책 정보를 모델에 추가하여 상세보기 페이지로 전달
-        model.addAttribute("bookDetail", bookDetail);
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        List<BookDTO> rList = Optional.ofNullable(bookService.getBookList(userId))
+                .orElseGet(ArrayList::new);
+
+        model.addAttribute("SS_USER_ID", userId);
+        model.addAttribute("rList", rList);
+
+        if (bookDetail != null) {
+            model.addAttribute("bookDetail", bookDetail);
+        } else {
+            model.addAttribute("error", "Book details not found.");
+        }
 
         log.info(this.getClass().getName() + ".showBookDetail End");
-
-        // detail.html을 표시하는 View로 이동
         return "search/detail";
     }
 
@@ -106,6 +95,7 @@ public class BookController {
                     .author(pDTO.author())
                     .imageUrl(pDTO.imageUrl())
                     .description(pDTO.description())
+                    .isbn(pDTO.isbn())
                     .build();
 
             /*

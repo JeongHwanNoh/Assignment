@@ -41,8 +41,14 @@ public class BookEntity {
     @Column(name = "description", length = 1000, nullable = false)
     private String description;
 
+    @NonNull
+    @Column(name = "isbn", length = 100, nullable = false)
+    private String isbn;
+
     @OneToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserInfoEntity userInfoEntity;
+
+
 
 }

@@ -5,32 +5,48 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
             text-align: center;
             margin: 0 auto;
+            padding: 20px;
         }
 
-        table {
-            border-collapse: collapse;
-            width: 50%; /* 조금 줄였습니다 */
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
             margin: 20px auto;
-            text-align: left; /* 열 가운데 정렬 */
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: left;
         }
 
-        th, td {
-            border: 1px solid #dddddd;
-            padding: 8px;
-            color: black;
-        }
-
-        th {
+        .card-header {
             background-color: #007bff;
-            width: 20%; /* 열의 크기를 줄였습니다 */
             color: white;
+            padding: 10px 20px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            margin: -20px -20px 20px -20px;
+        }
+
+        .card-content {
+            margin-bottom: 20px;
+        }
+
+        .card-content h3 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .card-content p {
+            margin: 10px 0;
         }
 
         .btn-group {
-            margin-top: 20px;
-            text-align: center; /* 버튼 가운데 정렬 */
+            text-align: center;
         }
 
         .btn-group button {
@@ -51,10 +67,20 @@
             background-color: #0056b3;
         }
 
-        /* 수정된 스타일 */
+        .btn-group button[type="reset"] {
+            background-color: #6c757d;
+        }
+
+        .btn-group button[type="reset"]:hover {
+            background-color: #5a6268;
+        }
+
         #btnDelete {
             background-color: #dc3545;
-            font-weight: bold;
+        }
+
+        #btnDelete:hover {
+            background-color: #c82333;
         }
     </style>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
@@ -114,32 +140,29 @@
     </script>
 </head>
 <body>
-<br/>
-<br/>
-<br/>
-<br/>
-<table>
-    <tr>
-        <th style="width: 20%;">제목</th>
-        <td th:text="${rDTO.title}"></td>
-    </tr>
-    <tr>
-        <th style="width: 20%;">작성일</th>
-        <td th:text="${rDTO.regDt}"></td>
-    </tr>
-    <tr>
-        <th style="width: 20%;">조회수</th>
-        <td th:text="${rDTO.readCnt}"></td>
-    </tr>
-    <tr>
-        <th style="width: 20%;">내용</th>
-        <td th:text="${rDTO.contents}"></td>
-    </tr>
-</table>
-<div class="btn-group">
-    <button id="btnEdit" type="button">수정</button>
-    <button id="btnDelete" type="button">삭제</button>
-    <button id="btnList" type="button">목록</button>
+<div class="card">
+    <div class="card-header">공지사항 상세</div>
+    <div class="card-content">
+        <h3>제목</h3>
+        <p th:text="${rDTO.title}"></p>
+    </div>
+    <div class="card-content">
+        <h3>작성일</h3>
+        <p th:text="${rDTO.regDt}"></p>
+    </div>
+    <div class="card-content">
+        <h3>조회수</h3>
+        <p th:text="${rDTO.readCnt}"></p>
+    </div>
+    <div class="card-content">
+        <h3>내용</h3>
+        <p th:text="${rDTO.contents}"></p>
+    </div>
+    <div class="btn-group">
+        <button id="btnEdit" type="button">수정</button>
+        <button id="btnDelete" type="button">삭제</button>
+        <button id="btnList" type="button">목록</button>
+    </div>
 </div>
 </body>
 </html>

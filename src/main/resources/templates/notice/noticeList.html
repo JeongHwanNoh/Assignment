@@ -19,27 +19,56 @@
     <!-- Core theme CSS (includes Bootstrap)-->
     <link href="/css/styles.css" rel="stylesheet"/>
 
-
     <style>
+        /* 카드 스타일 */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
 
-        /*!* 테이블 스타일 *!*/
-        .table-container {
-            background-color: #f8f9fa;
+        .card {
+            flex: 1 1 calc(33.333% - 20px);
+            background-color: #fff;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
+            transition: transform 0.2s;
+            cursor: pointer;
+            max-width: 300px; /* 고정된 너비 */
+            max-height: 400px; /* 고정된 높이 */
+            overflow: hidden; /* 내용이 많을 경우 숨기기 */
         }
 
-        .table-header {
-            background-color: #007bff;
-            color: white;
+        .card:hover {
+            transform: translateY(-5px);
         }
 
-        /* 버튼 스타일 */
+        .card-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .card-body {
+            font-size: 14px;
+            color: #6c757d;
+            overflow-y: auto; /* 내용이 많을 경우 스크롤 */
+            max-height: 300px; /* 내용의 최대 높이 설정 */
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
         .btn-primary {
             background-color: #007bff;
             border-color: #007bff;
-            margin-top: 10px; /* 위쪽으로 여백 추가 */
+            margin-top: 10px;
         }
 
         .btn-primary:hover {
@@ -47,51 +76,23 @@
             border-color: #0056b3;
         }
 
-        /* 테이블 내 글씨 크기 조절 */
-        .table td, .table th {
-            font-size: 14px;
-            text-align: center; /* 가운데 정렬 추가 */
-            overflow: hidden; /* 넘치는 텍스트 숨김 */
-            white-space: nowrap; /* 줄 바꿈 방지 */
-            text-overflow: ellipsis; /* 텍스트가 넘칠 때 생략 부호(...) 표시 */
-        }
-
-        /* 공지사항 표시 글씨 크기 조절 */
-        .notice {
-            font-size: 14px;
-            font-weight: bold;
-            text-align: center; /* 가운데 정렬 추가 */
-        }
-
-        /* 제목 폭 넓히기 */
-        .table-container table td:nth-child(1) {
-            width: 40%; /* 적절한 폭 설정 */
-            text-align: left; /* 왼쪽 정렬 추가 */
-        }
-
-        /* 조회수, 등록자, 등록일 폭 설정 */
-        .table-container table td:nth-child(n+2) {
-            width: 20%; /* 적절한 폭 설정 */
-        }
-
-        .menu li {
-            display: inline;
-        }
-
-        .menu li a {
+        .btn-write {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 50%;
+            padding: 15px 20px;
             color: white;
-            text-decoration: none;
-            padding: 10px;
-            border-right: 1px solid #0056b3;
+            font-size: 18px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.2s;
         }
 
-        .menu li a:last-child {
-            border-right: none;
-        }
-
-        .menu li a:hover {
+        .btn-write:hover {
             background-color: #0056b3;
-            border-radius: 5px;
+            transform: translateY(-3px);
         }
     </style>
 
@@ -130,7 +131,6 @@
                 logOut();
             });
 
-
             // 로그아웃 함수
             function logOut() {
                 $.ajax({
@@ -150,15 +150,27 @@
 
             // 페이지 로드 시 버튼 표시 여부 설정
             displayButtons(isLoggedIn);
-        });
 
+            // 카드 클릭 시 상세보기로 이동
+            $(".card").on("click", function () {
+                var nSeq = $(this).data("seq");
+                location.href = "/notice/noticeInfo?nSeq=" + nSeq;
+            });
+
+            // 글쓰기 버튼 클릭 시
+            $(".btn-write").on("click", function () {
+                if (isLoggedIn) {
+                    location.href = "/notice/noticeReg";
+                } else {
+                    alert("로그인 후 이용해주세요.");
+                }
+            });
+        });
 
         function doDetail(seq) {
             location.href = "/notice/noticeInfo?nSeq=" + seq;
         }
-
     </script>
-
 </head>
 
 <body class="d-flex flex-column h-100 bg-light">
@@ -176,7 +188,7 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
                     <li class="nav-item"><a class="nav-link" href="/calendar/info">일정</a></li>
                     <li class="nav-item"><a class="nav-link" href="/search/book">도서</a></li>
-                    <li class="nav-item"><a class="nav-link" href="plan">목표</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/review/reviewList">목표</a></li>
                     <li class="nav-item"><a class="nav-link" href="/library/search">도서관 찾기</a></li>
                     <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
                     <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/login">마이페이지</a></li>
@@ -188,32 +200,20 @@
     <!-- Projects Section-->
     <section class="py-5">
         <div class="container">
-            <div class="table-container">
-                <table class="table table-bordered">
-                    <thead class="table-header">
-                    <tr>
-                        <th scope="col">제목</th>
-                        <th scope="col">조회수</th>
-                        <th scope="col">등록자</th>
-                        <th scope="col">등록일</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <!-- 공지 리스트 반복 -->
-                    <tr th:each="dto: ${rList}">
-                        <th:block th:with="detailUrl=@{'/notice/noticeInfo?nSeq=' + ${dto.noticeSeq}}">
-                            <td>
-                                <a th:href="${detailUrl}" th:text="${dto.title}"></a>
-                            </td>
-                        </th:block>
-                        <td th:text="${dto.readCnt}"></td>
-                        <td th:text="${dto.userId}"></td>
-                        <td th:text="${dto.regDt}"></td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="card-container">
+                <!-- 공지 리스트 반복 -->
+                <div class="card" th:each="dto: ${rList}" th:data-seq="${dto.noticeSeq}">
+                    <div class="card-header">
+                        <span th:text="${dto.title}"></span>
+                    </div>
+                    <div class="card-body">
+                        <p>조회수: <span th:text="${dto.readCnt}"></span></p>
+                        <p>등록자: <span th:text="${dto.userId}"></span></p>
+                        <p>등록일: <span th:text="${dto.regDt}"></span></p>
+                    </div>
+                </div>
             </div>
-            <a href="/notice/noticeReg" class="btn btn-primary float-right">글쓰기</a>
+            <a class="btn btn-write"><i class="bi bi-pencil-square"></i></a>
         </div>
     </section>
 </main>
