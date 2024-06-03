@@ -87,6 +87,7 @@ public class UserInfoController {
         String email = CmmUtil.nvl(request.getParameter("email"));
         String addr1 = CmmUtil.nvl(request.getParameter("addr1"));
         String addr2 = CmmUtil.nvl(request.getParameter("addr2"));
+        String genre = CmmUtil.nvl(request.getParameter("genre"));
 
         log.info("userId : " + userId);
         log.info("userName : " + userName);
@@ -94,6 +95,8 @@ public class UserInfoController {
         log.info("email : " + email);
         log.info("addr1 : " + addr1);
         log.info("addr2 : " + addr2);
+        log.info("genre : " + genre);
+
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
@@ -105,6 +108,7 @@ public class UserInfoController {
                 .addr2(addr2)
                 .regId(userId)
                 .chgId(userId)
+                .genre(genre)
                 .build();
 
         int res = userInfoService.insertUserInfo(pDTO);
@@ -339,7 +343,7 @@ public class UserInfoController {
 
     @ResponseBody
     @PostMapping(value = "userDelete")
-    public MsgDTO userDelete(HttpServletRequest request) {
+    public MsgDTO userDelete(HttpServletRequest request, HttpSession session) {
 
         log.info(this.getClass().getName() + ".Delete Start!");
 
@@ -362,6 +366,9 @@ public class UserInfoController {
             UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
 
             userInfoService.deleteUserInfo(pDTO);
+
+            session.setAttribute("SS_USER_ID", "");
+            session.removeAttribute("SS_USER_ID");
 
             msg = "탈퇴되었습니다. 이용해주셔서 감사합니다";
 

@@ -105,7 +105,8 @@
                     <div class="col-md-12 mb-3">
                         <label>이메일</label>
                         <div class="input-group">
-                            <input type="email" class="form-control" name="email" placeholder="you@example.com" required>
+                            <input type="email" class="form-control" name="email" placeholder="you@example.com"
+                                   required>
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" id="btnEmail">인증코드 전송</button>
                             </div>
@@ -200,7 +201,7 @@
             url: "/user/getUserIdExists",
             type: "post",
             dataType: "JSON",
-            data: { userId: userId },
+            data: {userId: userId},
             success: function (json) {
                 if (json.existsYn === "Y") {
                     alert("이미 가입된 아이디가 존재합니다.");
@@ -224,7 +225,7 @@
             url: "/user/getEmailExists",
             type: "post",
             dataType: "JSON",
-            data: { email: email },
+            data: {email: email},
             success: function (json) {
                 if (json.existsYn === "Y") {
                     alert("이미 가입된 이메일 주소가 존재합니다.");
@@ -267,12 +268,16 @@
             return;
         }
 
+        // 폼 데이터 확인용
+        const formData = $("#registration-form").serialize();
+        console.log(formData); // 폼 데이터가 올바르게 직렬화되었는지 확인
+
         // 이메일 인증이 성공한 경우에만 회원가입 요청을 서버에 보냄
         $.ajax({
             url: "/user/insertUserInfo",
             type: "post",
             dataType: "JSON",
-            data: $("#registration-form").serialize(),
+            data: formData,
             success: function (json) {
                 if (json.result === 1) {
                     alert(json.msg);
