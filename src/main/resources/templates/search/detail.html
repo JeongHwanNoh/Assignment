@@ -65,31 +65,72 @@
             background-color: #0056b3;
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function addBookToWishlist() {
-            var bookData = {
-                title: $("#book-title").text(),
-                author: $("#book-author").text(),
-                imageUrl: $("#book-image").attr("src"),
-                description: $("#book-description").text()
-            };
 
-            $.ajax({
-                url: "/search/bookInsert",
-                type: "post",
-                contentType: "application/json", // JSON 데이터 전송을 명시
-                data: JSON.stringify(bookData), // bookData를 JSON 문자열로 변환하여 전송
-                dataType: "json",
-                success: function(response) {
-                    alert(response.msg);
-                    location.href = "/search/book";
-                },
-                error: function(error) {
-                    console.error("Error adding book to wishlist:", error);
-                    alert("책 찜하기에 실패했습니다.");
+    <script th:inline="javascript">
+        var rListIsbns = [];
+        /*[# th:each="book : ${rList}"]*/
+        rListIsbns.push([[${book.isbn}]].toString()); // 모든 ISBN을 문자열로 변환하여 저장
+        /*[/]*/
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function () {
+            var currentBookIsbn = document.getElementById('book-isbn').innerText.trim(); // 문자열로 변환
+            var wishlistButton = document.getElementById('wishlistButton');
+            var goBackButton = document.getElementById('goBackButton');
+            var alreadyInWishlist = false;
+
+            // rList에서 가져온 각 책의 ISBN을 순회하면서 현재 책의 ISBN과 일치하는지 확인
+            rListIsbns.forEach(function (isbn) {
+                if (isbn === currentBookIsbn) { // 문자열로 비교
+                    // 현재 책이 찜 목록에 있으면 찜하기 버튼 숨기기
+                    wishlistButton.style.display = 'none';
+                    // 이미 찜한 목록에 있는 책이라는 알람 보여주기
+                    alreadyInWishlist = true;
                 }
             });
+
+            // 찜 목록에 이미 있는 책인 경우 돌아가기 버튼으로 대체
+            if (!alreadyInWishlist) {
+                wishlistButton.style.display = 'inline-block';
+            } else {
+                goBackButton.style.display = 'inline-block';
+            }
+        });
+
+        function addBookToWishlist() {
+            var isbn = getParameterByName('isbn'); // ISBN 가져오기
+            var bookData = {
+                isbn: isbn,
+                title: document.getElementById("book-title").innerText,
+                author: document.getElementById("book-author").innerText,
+                imageUrl: document.getElementById("book-image").src,
+                description: document.getElementById("book-description").innerText
+            };
+
+            fetch("/search/bookInsert", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(bookData)
+            }).then(response => response.json())
+                .then(data => {
+                    alert(data.msg);
+                    location.href = "/search/book";
+                }).catch(error => {
+                console.error("Error adding book to wishlist:", error);
+                alert("책 찜하기에 실패했습니다.");
+            });
+        }
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
     </script>
 </head>
@@ -100,9 +141,10 @@
     <h2 id="book-title" th:text="${bookDetail.title}"></h2>
     <p>저자: <span id="book-author" th:text="${bookDetail.author}"></span></p>
     <p>설명: <span id="book-description" th:text="${bookDetail.description}"></span></p>
+    <p id="book-isbn" style="display: none;" th:text="${bookDetail.isbn}"></p>
     <div class="buttons">
-        <button onclick="addBookToWishlist()">찜하기</button>
-        <button onclick="window.history.back();">돌아가기</button>
+        <button id="wishlistButton" style="display: none;" onclick="addBookToWishlist()">찜하기</button>
+        <button id="goBackButton" onclick="window.history.back();">돌아가기</button>
     </div>
 </div>
 </body>
