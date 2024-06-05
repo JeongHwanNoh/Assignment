@@ -1,10 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독후감 상세보기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-image {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .book-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-details {
+            text-align: center;
+        }
+
+        .book-details h2 {
+            margin-top: 0;
+            font-size: 2.5em;
+            color: #333;
+        }
+
+        .book-details p {
+            margin: 10px 0;
+            color: #555;
+            font-size: 1.2em;
+        }
+
+        .review-content {
+            margin: 20px 0;
+            padding: 20px;
+            font-size: 1.2em; /* 저자와 동일한 글씨 크기 */
+            line-height: 1.6;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            text-align: left; /* 왼쪽 정렬 */
+            width: 90%; /* 칸을 더 넓게 설정 */
+            margin: 0 auto; /* 수평 가운데 정렬 */
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .star {
+            font-size: 24px;
+            color: hsl(60, 80%, 45%);
+            cursor: pointer;
+            margin: 0 2px;
+        }
+
+        .star.filled {
+            color: hsl(45, 80%, 55%);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        const reviewSeq = [[${rDTO.reviewSeq}]];
+    </script>
+    <script>
+        function deleteReview() {
+            if (confirm('정말로 이 독후감을 삭제하시겠습니까?')) {
+                $.ajax({
+                    url: '/review/reviewDelete',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {"reviewSeq": reviewSeq}, // 폼 데이터로 전송
+                    success: function(response) {
+                        alert(response.msg);
+                        location.href = "/review/reviewList"; // 페이지 새로고침
+                    },
+                    error: function(xhr, status, error) {
+                        alert('삭제에 실패하였습니다.');
+                    }
+                });
+            }
+        }
+
+        function editReview() {
+            // 현재 상세보기 페이지의 독후감 번호를 가져와 변수에 저장합니다.
+            var reviewSeq = [[${rDTO.reviewSeq}]];
+            location.href = "/review/reviewEditInfo?reviewSeq=" + reviewSeq;
+        }
+    </script>
 </head>
 <body>
-
+<div th:each="review : ${rDTO}" class="container">
+    <div class="book-image">
+        <img th:src="${review.imageUrl}" alt="책 이미지">
+    </div>
+    <div class="book-details">
+        <h2 th:text="${review.title}">책 제목</h2>
+        <p><strong>저자: </strong><span th:text="${review.author}">저자</span></p>
+        <p><strong>작성자: </strong><span th:text="${review.userId}">작성자</span></p>
+        <p><strong>작성일: </strong><span th:text="${review.regDt}">작성일</span></p>
+    </div>
+    <div class="review-content" th:text="${review.contents}">독후감 내용</div>
+    <div class="star-rating" th:data-rating="${review.rating}"></div>
+    <div class="button-group">
+        <!-- 수정된 부분: reviewSeq 값을 직접 전달하는 것이 아니라 JavaScript 변수로 할당된 값을 사용합니다. -->
+        <button onclick="editReview()">수정</button>
+        <button onclick="deleteReview()">삭제</button>
+    </div>
+</div>
 </body>
 </html>

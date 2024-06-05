@@ -18,6 +18,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 60px;
+            justify-content: center;
         }
 
         .review-card {
@@ -32,6 +33,7 @@
             width: 250px;
             box-sizing: border-box;
             transition: transform 0.2s ease-in-out;
+            text-align: center; /* 모든 텍스트 요소를 가운데 정렬 */
         }
 
         .review-card:hover {
@@ -43,19 +45,21 @@
             width: 150px;
             height: auto;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin: 0 auto; /* 이미지를 중앙에 정렬 */
         }
 
         .review-title {
             font-size: 1.5em;
             margin: 10px 0;
-            text-align: center; /* 가운데 정렬 */
+            word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
         }
 
         .review-author {
             font-size: 1.2em;
             margin: 5px 0;
             color: #555;
-            text-align: center; /* 가운데 정렬 */
+            word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
         }
 
         .star-rating {
@@ -85,12 +89,17 @@
         .review-card a:hover {
             color: #007bff; /* 호버 시 색상 변경 */
         }
+
+        .review-datetime {
+            word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div th:each="review : ${rList}" class="review-card">
-        <a th:href="'/review/reviewInfo?nSeq=' + ${review.reviewSeq}"> <!-- 상세 정보 페이지로 이동하는 링크 -->
+        <a th:href="'/review/reviewInfo?reviewSeq=' + ${review.reviewSeq}"> <!-- 상세 정보 페이지로 이동하는 링크 -->
             <img th:src="${review.imageUrl}" alt="책 이미지">
             <div class="review-title" th:text="${review.title}">독후감 제목</div>
             <div class="review-author" th:text="${review.userId}">이름</div>

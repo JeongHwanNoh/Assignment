@@ -3,6 +3,7 @@ package kopo.poly.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kopo.poly.dto.BookDTO;
+import kopo.poly.dto.CalendarDTO;
 import kopo.poly.dto.NoticeDTO;
 import kopo.poly.dto.ReviewDTO;
 import kopo.poly.repository.BookRepository;
@@ -107,8 +108,12 @@ public class ReviewService implements IReviewService {
 
         ReviewEntity rEntity = reviewRepository.findByReviewSeq(pDTO.reviewSeq());
 
+
+
         // 엔티티의 값들을 DTO에 맞게 넣어주기
         ReviewDTO rDTO = new ObjectMapper().convertValue(rEntity, ReviewDTO.class);
+
+        log.info("확인 " + rEntity);
 
         log.info(this.getClass().getName() + ".getReviewInfo End!");
 
@@ -167,7 +172,6 @@ public class ReviewService implements IReviewService {
 
         // 데이터 수정하기
         reviewRepository.deleteById(reviewSeq);
-
 
         log.info(this.getClass().getName() + ".deleteReviewInfo End!");
     }

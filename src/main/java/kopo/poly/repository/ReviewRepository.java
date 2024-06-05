@@ -15,6 +15,5 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Long> {
      */
     List<ReviewEntity> findAllByOrderByReviewSeqDesc();
 
-    ReviewEntity findByReviewSeq(Long ReviewSeq);
-
+    ReviewEntity findByReviewSeq(Long reviewSeq);
 }

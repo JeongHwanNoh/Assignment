@@ -7,38 +7,37 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f0f2f5;
             margin: 0;
             padding: 20px;
         }
-
         .container {
-            width: 50%;
+            max-width: 600px;
             margin: 0 auto;
             background-color: #ffffff;
-            padding: 20px;
+            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .form-group {
             margin-bottom: 20px;
-            display: flex;
-            align-items: flex-start;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            flex: 1;
+            font-weight: bold;
+            color: #333;
         }
 
         .form-group input, .form-group textarea {
-            flex: 2;
+            width: calc(100% - 22px);
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
         }
 
         .form-group button {
@@ -49,9 +48,10 @@
             background-color: #007bff;
             color: white;
             cursor: pointer;
-            margin-left: 10px;
-            margin-top: 7px;
+            margin-left: 10px; /* 저장과 취소 버튼 사이에 간격을 조절합니다. */
+            margin-top: 7px; /* 버튼의 위쪽 여백을 설정합니다. */
         }
+
 
         .form-group button:hover {
             background-color: #0056b3;
@@ -61,41 +61,110 @@
             max-width: 100%;
             height: auto;
             margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
         }
 
         .star-rating {
             display: flex;
             justify-content: center;
             margin-top: 10px;
+            flex-direction: row-reverse; /* Change the direction */
         }
 
-        .star {
-            appearance: none;
-            padding: 1px;
-            font-size: 24px;
+        .star-rating input {
+            display: none;
         }
 
-        .star::after {
-            content: '☆';
-            color: hsl(60, 80%, 45%);
+        .star-rating label {
+            font-size: 30px;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.3s;
         }
 
-        .star:hover::after,
-        .star:has(~ .star:hover)::after,
-        .star:checked::after,
-        .star:has(~ .star:checked)::after {
-            content: '★';
+        .star-rating input:checked ~ label,
+        .star-rating input:checked ~ label ~ label {
+            color: #ffcc00;
         }
 
-        .star:hover ~ .star::after {
-            content: '☆';
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffcc00;
         }
+
+        /* 저장과 취소 버튼을 오른쪽으로 배치하는 스타일 */
+        /* 저장과 취소 버튼을 오른쪽으로 배치하는 스타일 */
+        /* 저장과 취소 버튼을 오른쪽으로 배치하는 스타일 */
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end; /* 버튼을 오른쪽으로 배치합니다. */
+            align-items: center;
+        }
+
+        /* 저장 버튼과 취소 버튼 수정 */
+        .form-group button {
+            padding: 10px 20px; /* 버튼의 상하 여백과 좌우 여백을 설정합니다. */
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px; /* 저장과 취소 버튼 사이에 간격을 조절합니다. */
+            margin-top: 0; /* 책 검색 버튼의 위쪽 여백을 없앱니다. */
+            min-width: auto; /* 버튼의 최소 너비를 자동으로 설정합니다. */
+            white-space: nowrap; /* 텍스트가 한 줄로만 표시되도록 설정합니다. */
+        }
+
+
+        /* 저장과 취소 버튼의 호버 스타일 수정 */
+        .form-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 저장 버튼 스타일 */
+        /* 저장 버튼 스타일 */
+        .save-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            cursor: pointer;
+            margin-right: 10px; /* 저장 버튼과 취소 버튼 사이의 간격 조절 */
+        }
+
+        /* 취소 버튼 스타일 */
+        .cancel-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            cursor: pointer;
+            margin-left: 10px; /* 저장 버튼과 취소 버튼 사이의 간격 조절 */
+        }
+
+
+        /* 버튼 호버 스타일 */
+        .save-button:hover,
+        .cancel-button:hover {
+            background-color: #0056b3;
+        }
+
+
     </style>
     <script>
         function setBookInfo(title, author, imageUrl) {
             document.getElementById('book-title').value = title;
             document.getElementById('book-author').value = author;
-            document.getElementById('book-image').src = imageUrl;
+            var bookImage = document.getElementById('book-image');
+            bookImage.src = imageUrl;
+            bookImage.style.display = 'block';
         }
 
         function openSearchPopup() {
@@ -123,6 +192,7 @@
                     if (xhr.status === 200) {
                         var response = JSON.parse(xhr.responseText);
                         alert(response.msg);
+                        location.href = "/review/reviewList";
                     } else {
                         alert('오류가 발생했습니다.');
                     }
@@ -144,34 +214,38 @@
     <form id="reviewForm" action="/review/save" method="post" onsubmit="submitForm(event)">
         <div class="form-group">
             <label for="book-title">책 제목</label>
-            <input type="text" id="book-title" name="title" readonly>
-            <button type="button" onclick="openSearchPopup()">책 검색</button>
+            <div style="display: flex; align-items: center;">
+                <input type="text" id="book-title" name="title" readonly>
+                <button type="button" onclick="openSearchPopup()"> 책 검색</button>
+            </div>
         </div>
         <div class="form-group">
             <label for="book-author">저자</label>
             <input type="text" id="book-author" name="author" readonly>
         </div>
         <div class="form-group">
-            <label for="book-image">이미지</label>
-            <img id="book-image" src="" alt="책 이미지">
+            <img id="book-image" alt="책 이미지">
         </div>
         <div class="form-group">
             <label for="review">독후감</label>
             <textarea id="review" name="contents" rows="10"></textarea>
         </div>
-        <div class="form-floating">
+        <div class="form-group">
             <label for="rating">별점</label>
             <div class="star-rating">
-                <input type="radio" class="star" name="rating" value="1">
-                <input type="radio" class="star" name="rating" value="2">
-                <input type="radio" class="star" name="rating" value="3">
-                <input type="radio" class="star" name="rating" value="4">
-                <input type="radio" class="star" name="rating" value="5">
+                <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
             </div>
         </div>
-        <button type="submit">저장</button>
-        <button type="button" onclick="cancel()">취소</button>
+        <div class="form-buttons">
+            <button type="submit" class="save-button">저장</button>
+            <button type="button" class="cancel-button" onclick="cancel()">취소</button>
+        </div>
     </form>
 </div>
 </body>
 </html>
+

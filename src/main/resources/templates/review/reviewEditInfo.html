@@ -1,10 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독후감 수정</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+            margin-top: 7px;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .form-group img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            flex-direction: row-reverse;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 30px;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .star-rating input:checked ~ label,
+        .star-rating input:checked ~ label ~ label {
+            color: #ffcc00;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffcc00;
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-buttons button {
+            flex: 1;
+            margin: 0 5px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadReviewData();
+        });
+
+        function loadReviewData() {
+            var reviewSeq = getQueryParameter('reviewSeq'); // URL에서 reviewSeq 파라미터 가져오기
+            fetch(`/review/getReview?reviewSeq=${reviewSeq}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('review-seq').value = reviewSeq;
+                    document.getElementById('book-title').value = data.title;
+                    document.getElementById('book-author').value = data.author;
+                    var bookImage = document.getElementById('book-image');
+                    bookImage.src = data.imageUrl;
+                    bookImage.style.display = 'block';
+                    document.getElementById('review').value = data.contents;
+                    document.querySelector(`.star-rating input[value="${data.rating}"]`).checked = true;
+                })
+                .catch(error => {
+                    console.error('Error fetching review data:', error);
+                });
+        }
+
+        function getQueryParameter(name) {
+            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+            var results = regex.exec(location.search);
+            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+
+        function openSearchPopup() {
+            window.open('/review/searchpop', '책 검색', 'width=600,height=400');
+        }
+
+        function cancel() {
+            if (confirm("수정을 취소하시겠습니까?")) {
+                window.history.back();
+            }
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+            var formData = new FormData(document.getElementById('reviewForm'));
+
+            // 이미지 URL 추가
+            var imageUrl = document.getElementById('book-image').src;
+            formData.append('imageUrl', imageUrl);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/review/reviewUpdate', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        alert(response.msg);
+                        if (response.msg === "수정되었습니다.") {
+                            window.location.href = '/review/list';
+                        }
+                    } else {
+                        alert('오류가 발생했습니다.');
+                    }
+                }
+            };
+            xhr.send(formData);
+        }
+    </script>
 </head>
 <body>
-
+<div class="container">
+    <h1>독후감 수정</h1>
+    <form id="reviewForm" onsubmit="submitForm(event)">
+        <input type="hidden" id="review-seq" name="reviewSeq">
+        <div class="form-group">
+            <label for="book-title">책 제목</label>
+            <div style="display: flex; align-items: center;">
+                <input type="text" id="book-title" name="title" readonly>
+                <button type="button" onclick="openSearchPopup()">책 검색</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="book-author">저자</label>
+            <input type="text" id="book-author" name="author" readonly>
+        </div>
+        <div class="form-group">
+            <img id="book-image" alt="책 이미지">
+        </div>
+        <div class="form-group">
+            <label for="review">독후감</label>
+            <textarea id="review" name="contents" rows="10"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="rating">별점</label>
+            <div class="star-rating">
+                <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+            </div>
+        </div>
+        <div class="form-buttons">
+            <button type="submit" style="background-color: #007bff;">저장</button>
+            <button type="button" onclick="cancel()" style="background-color: #007bff;">취소</button>
+        </div>
+    </form>
+</div>
 </body>
 </html>
