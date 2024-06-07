@@ -53,16 +53,20 @@
         .review-content {
             margin: 20px 0;
             padding: 20px;
-            font-size: 1.2em; /* 저자와 동일한 글씨 크기 */
+            font-size: 1.2em;
             line-height: 1.6;
             color: #333;
             border: 1px solid #ddd;
             border-radius: 8px;
             background-color: #fafafa;
-            text-align: left; /* 왼쪽 정렬 */
-            width: 90%; /* 칸을 더 넓게 설정 */
-            margin: 0 auto; /* 수평 가운데 정렬 */
+            text-align: left;
+            width: 60%;
+            margin: 0 auto;
+            min-height: 200px; /* 최소 높이 설정 */
+            max-height: 1000px; /* 최대 높이 설정 */
+            overflow-y: auto; /* 필요시 수직 스크롤 표시 */
         }
+
 
         .star-rating {
             display: flex;
@@ -131,6 +135,32 @@
             var reviewSeq = [[${rDTO.reviewSeq}]];
             location.href = "/review/reviewEditInfo?reviewSeq=" + reviewSeq;
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var starRatings = document.querySelectorAll('.star-rating');
+
+            starRatings.forEach(function(ratingElement) {
+                var rating = ratingElement.getAttribute('data-rating');
+                if (rating) {
+                    displayRatingStars(parseInt(rating), ratingElement);
+                }
+            });
+        });
+
+        // 별점을 표시하는 함수
+        function displayRatingStars(rating, container) {
+            container.innerHTML = ''; // 이전에 생성된 요소를 지웁니다.
+            for (var i = 1; i <= 5; i++) {
+                var star = document.createElement('span');
+                star.classList.add('star');
+                star.textContent = '☆';
+                if (i <= rating) {
+                    star.classList.add('filled');
+                    star.textContent = '★';
+                }
+                container.appendChild(star);
+            }
+        }
     </script>
 </head>
 <body>
@@ -144,7 +174,8 @@
         <p><strong>작성자: </strong><span th:text="${review.userId}">작성자</span></p>
         <p><strong>작성일: </strong><span th:text="${review.regDt}">작성일</span></p>
     </div>
-    <div class="review-content" th:text="${review.contents}">독후감 내용</div>
+    <div class="review-content" th:text="${review.contents} ">독후감 내용</div>
+
     <div class="star-rating" th:data-rating="${review.rating}"></div>
     <div class="button-group">
         <!-- 수정된 부분: reviewSeq 값을 직접 전달하는 것이 아니라 JavaScript 변수로 할당된 값을 사용합니다. -->

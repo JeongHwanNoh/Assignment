@@ -14,10 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Slf4j
 @RequestMapping(value = "/review")
@@ -233,9 +231,15 @@ public class ReviewController {
             String reviewSeq = CmmUtil.nvl(request.getParameter("reviewSeq")); // 글번호(PK)
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
-            String author = CmmUtil.nvl(request.getParameter("author")); // 내용
+            String author = CmmUtil.nvl(request.getParameter("author")); // 작성자
             String imageUrl = CmmUtil.nvl(request.getParameter("imageUrl"));
             Long rating = Long.parseLong(CmmUtil.nvl(request.getParameter("rating")));
+            String regDt = CmmUtil.nvl(request.getParameter("regDt"));
+
+            // regDt 값이 비어 있으면 현재 날짜로 설정
+            if (regDt.isEmpty()) {
+                regDt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+            }
 
             log.info("reviewSeq : " + reviewSeq);
             log.info("session user_id : " + userId);
@@ -244,11 +248,12 @@ public class ReviewController {
             log.info("author : " + author);
             log.info("imageUrl : " + imageUrl);
             log.info("rating : " + rating);
+            log.info("regDt : " + regDt);
 
             // 데이터 저장하기 위해 DTO에 저장하기
             ReviewDTO pDTO = ReviewDTO.builder().userId(userId).title(title).author(author)
-                            .reviewSeq(Long.parseLong(reviewSeq)).contents(contents).imageUrl(imageUrl)
-                                    .rating(rating).build();
+                    .reviewSeq(Long.parseLong(reviewSeq)).contents(contents).imageUrl(imageUrl).regDt(regDt)
+                    .rating(rating).build();
 
             reviewService.updateReviewInfo(pDTO);
 
@@ -264,12 +269,13 @@ public class ReviewController {
             // 결과 메시지 전달하기
             dto = MsgDTO.builder().msg(msg).build();
 
-            log.info(this.getClass().getName() + ".noticeUpdate End!");
+            log.info(this.getClass().getName() + ".reviewUpdate End!");
 
         }
 
         return dto;
     }
+
     @ResponseBody
     @PostMapping(value = "reviewDelete")
     public MsgDTO reviewDelete(HttpServletRequest request) {

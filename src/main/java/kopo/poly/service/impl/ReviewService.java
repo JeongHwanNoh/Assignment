@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -136,6 +138,11 @@ public class ReviewService implements IReviewService {
         String imageUrl = CmmUtil.nvl(pDTO.imageUrl());
         String regDt = CmmUtil.nvl(pDTO.regDt());
 
+        // regDt 값이 비어 있으면 현재 날짜로 설정
+        if (regDt.isEmpty()) {
+            regDt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        }
+
         log.info("reviewSeq : " + reviewSeq);
         log.info("title : " + title);
         log.info("contents : " + contents);
@@ -144,9 +151,6 @@ public class ReviewService implements IReviewService {
         log.info("author : " + author);
         log.info("imageUrl : " + imageUrl);
         log.info("regDt : " + regDt);
-
-        // 현재 공지사항 조회수 가져오기
-        ReviewEntity rEntity = reviewRepository.findByReviewSeq(reviewSeq);
 
         // 수정할 값들을 빌더를 통해 엔티티에 저장하기
         ReviewEntity pEntity = ReviewEntity.builder()
@@ -158,8 +162,8 @@ public class ReviewService implements IReviewService {
         reviewRepository.save(pEntity);
 
         log.info(this.getClass().getName() + ".updateReviewInfo End!");
-
     }
+
 
     @Override
     public void deleteReviewInfo(ReviewDTO pDTO) throws Exception {

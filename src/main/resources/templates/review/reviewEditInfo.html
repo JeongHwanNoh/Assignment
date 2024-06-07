@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>독후감 수정</title>
     <style>
+        /* 스타일 정의 (기존 코드와 동일) */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f2f5;
@@ -48,8 +49,8 @@
             background-color: #007bff;
             color: white;
             cursor: pointer;
-            margin-left: 10px;
-            margin-top: 7px;
+            margin-left: 10px; /* 저장과 취소 버튼 사이에 간격을 조절합니다. */
+            margin-top: 7px; /* 버튼의 위쪽 여백을 설정합니다. */
         }
 
         .form-group button:hover {
@@ -69,7 +70,7 @@
             display: flex;
             justify-content: center;
             margin-top: 10px;
-            flex-direction: row-reverse;
+            flex-direction: row-reverse; /* Change the direction */
         }
 
         .star-rating input {
@@ -93,123 +94,151 @@
             color: #ffcc00;
         }
 
+        /* 저장과 취소 버튼을 오른쪽으로 배치하는 스타일 */
         .form-buttons {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* 버튼을 오른쪽으로 배치합니다. */
             align-items: center;
         }
 
-        .form-buttons button {
-            flex: 1;
-            margin: 0 5px;
+        /* 저장 버튼과 취소 버튼 수정 */
+        .form-group button {
+            padding: 10px 20px; /* 버튼의 상하 여백과 좌우 여백을 설정합니다. */
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px; /* 저장과 취소 버튼 사이에 간격을 조절합니다. */
+            margin-top: 0; /* 책 검색 버튼의 위쪽 여백을 없앱니다. */
+            min-width: auto; /* 버튼의 최소 너비를 자동으로 설정합니다. */
+            white-space: nowrap; /* 텍스트가 한 줄로만 표시되도록 설정합니다. */
+        }
+
+        /* 저장과 취소 버튼의 호버 스타일 수정 */
+        .form-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 저장 버튼 스타일 */
+        .save-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            cursor: pointer;
+            margin-right: 10px; /* 저장 버튼과 취소 버튼 사이의 간격 조절 */
+        }
+
+        /* 취소 버튼 스타일 */
+        .cancel-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            cursor: pointer;
+            margin-left: 10px; /* 저장 버튼과 취소 버튼 사이의 간격 조절 */
+        }
+
+        /* 버튼 호버 스타일 */
+        .save-button:hover,
+        .cancel-button:hover {
+            background-color: #0056b3;
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            loadReviewData();
-        });
-
-        function loadReviewData() {
-            var reviewSeq = getQueryParameter('reviewSeq'); // URL에서 reviewSeq 파라미터 가져오기
-            fetch(`/review/getReview?reviewSeq=${reviewSeq}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('review-seq').value = reviewSeq;
-                    document.getElementById('book-title').value = data.title;
-                    document.getElementById('book-author').value = data.author;
-                    var bookImage = document.getElementById('book-image');
-                    bookImage.src = data.imageUrl;
-                    bookImage.style.display = 'block';
-                    document.getElementById('review').value = data.contents;
-                    document.querySelector(`.star-rating input[value="${data.rating}"]`).checked = true;
-                })
-                .catch(error => {
-                    console.error('Error fetching review data:', error);
-                });
-        }
-
-        function getQueryParameter(name) {
-            name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-            var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
-            var results = regex.exec(location.search);
-            return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-        }
-
-        function openSearchPopup() {
-            window.open('/review/searchpop', '책 검색', 'width=600,height=400');
-        }
-
-        function cancel() {
-            if (confirm("수정을 취소하시겠습니까?")) {
-                window.history.back();
-            }
-        }
-
-        function submitForm(event) {
-            event.preventDefault();
-            var formData = new FormData(document.getElementById('reviewForm'));
-
-            // 이미지 URL 추가
-            var imageUrl = document.getElementById('book-image').src;
-            formData.append('imageUrl', imageUrl);
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', '/review/reviewUpdate', true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        alert(response.msg);
-                        if (response.msg === "수정되었습니다.") {
-                            window.location.href = '/review/list';
-                        }
-                    } else {
-                        alert('오류가 발생했습니다.');
-                    }
-                }
-            };
-            xhr.send(formData);
-        }
-    </script>
 </head>
 <body>
-<div class="container">
+<div class="container" th:each="review : ${rDTO}">
     <h1>독후감 수정</h1>
     <form id="reviewForm" onsubmit="submitForm(event)">
-        <input type="hidden" id="review-seq" name="reviewSeq">
+        <input type="hidden" id="review-seq" name="reviewSeq" th:value="${review.reviewSeq}">
         <div class="form-group">
             <label for="book-title">책 제목</label>
             <div style="display: flex; align-items: center;">
-                <input type="text" id="book-title" name="title" readonly>
+                <input type="text" id="book-title" name="title" readonly th:value="${review.title}">
                 <button type="button" onclick="openSearchPopup()">책 검색</button>
             </div>
         </div>
         <div class="form-group">
             <label for="book-author">저자</label>
-            <input type="text" id="book-author" name="author" readonly>
+            <input type="text" id="book-author" name="author" readonly th:value="${review.author}">
         </div>
         <div class="form-group">
-            <img id="book-image" alt="책 이미지">
+            <img id="book-image" alt="책 이미지" th:src="${review.imageUrl}">
         </div>
         <div class="form-group">
             <label for="review">독후감</label>
-            <textarea id="review" name="contents" rows="10"></textarea>
+            <textarea id="review" name="contents" rows="20" th:text="${review.contents}"></textarea>
         </div>
         <div class="form-group">
             <label for="rating">별점</label>
             <div class="star-rating">
-                <input type="radio" id="star5" name="rating" value="5"><label for="star5">★</label>
-                <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
-                <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
-                <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
-                <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+                <input type="radio" id="star5" name="rating" value="5" th:checked="${review.rating == 5}"><label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4" th:checked="${review.rating == 4}"><label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3" th:checked="${review.rating == 3}"><label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2" th:checked="${review.rating == 2}"><label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1" th:checked="${review.rating == 1}"><label for="star1">★</label>
             </div>
         </div>
         <div class="form-buttons">
-            <button type="submit" style="background-color: #007bff;">저장</button>
-            <button type="button" onclick="cancel()" style="background-color: #007bff;">취소</button>
+            <button type="submit" class="save-button">저장</button>
+            <button type="button" class="cancel-button" onclick="cancel()">취소</button>
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var imageUrl = document.getElementById('book-image').getAttribute('src');
+        if (imageUrl) {
+            document.getElementById('book-image').style.display = 'block';
+        }
+    });
+
+    function openSearchPopup() {
+        window.open('/review/searchpop', '책 검색', 'width=600,height=400');
+    }
+
+    function cancel() {
+        if (confirm("수정을 취소하시겠습니까?")) {
+            window.history.back();
+        }
+    }
+
+    // 팝업 창에서 선택된 책 정보를 업데이트하는 함수
+    function setBookInfo(title, author, imageUrl) {
+        document.getElementById('book-title').value = title;
+        document.getElementById('book-author').value = author;
+        var bookImage = document.getElementById('book-image');
+        bookImage.src = imageUrl;
+        bookImage.style.display = 'block';
+    }
+
+    // 폼 제출 함수
+    function submitForm(event) {
+        event.preventDefault(); // 폼 제출 방지
+        var formData = new FormData(document.getElementById('reviewForm'));
+
+        var imageUrl = document.getElementById('book-image').src;
+        formData.append('imageUrl', imageUrl); // 이 부분이 추가되어야 합니다.
+        // AJAX 요청 보내기
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/review/reviewUpdate', true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                alert('독후감이 성공적으로 업데이트되었습니다.');
+                window.location.href = '/review/reviewList'; // 목록 페이지로 이동
+            } else {
+                alert('독후감 업데이트에 실패했습니다. 다시 시도해주세요.');
+            }
+        };
+        xhr.send(formData);
+    }
+</script>
 </body>
 </html>
