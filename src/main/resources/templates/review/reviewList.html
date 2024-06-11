@@ -1,142 +1,291 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>독후감 리스트</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>Personal - Start Bootstrap Theme</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Custom Google font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&amp;display=swap"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet"/>
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="/css/styles.css" rel="stylesheet"/>
+
+
+    <script src="js/scripts.js"></script>
+    <script>
+        // 사용자 로그인 상태 확인 함수
+        function checkLoginStatus() {
+            // 세션 ID 가져오기
+            const SS_USER_ID = '[[${SS_USER_ID}]]';
+            // 알림으로 세션 ID 값 보여주기
+            return SS_USER_ID !== null && SS_USER_ID !== ''; // 세션 ID가 null이 아니고 비어있지 않으면 로그인 상태로 간주
         }
 
-        .container {
-            width: 80%;
-            margin: 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 60px;
-            justify-content: center;
-        }
+        // 페이지 로드 시 실행되는 함수
+        $(document).ready(function () {
+            // 페이지 로드 시 로그인 상태 확인
+            var isLoggedIn = checkLoginStatus();
 
-        .review-card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 250px;
-            box-sizing: border-box;
-            transition: transform 0.2s ease-in-out;
-            text-align: center; /* 모든 텍스트 요소를 가운데 정렬 */
-        }
-
-        .review-card:hover {
-            transform: scale(1.05);
-        }
-
-        .review-card img {
-            border-radius: 8px;
-            width: 150px;
-            height: auto;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            display: block;
-            margin: 0 auto; /* 이미지를 중앙에 정렬 */
-        }
-
-        .review-title {
-            font-size: 1.5em;
-            margin: 10px 0;
-            word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
-        }
-
-        .review-author {
-            font-size: 1.2em;
-            margin: 5px 0;
-            color: #555;
-            word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
-        }
-
-        .star-rating {
-            display: flex;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .star {
-            font-size: 24px;
-            color: hsl(60, 80%, 45%);
-            cursor: pointer;
-            margin: 0 2px;
-        }
-
-        .star.filled {
-            color: hsl(45, 80%, 55%);
-        }
-
-        /* 링크 스타일 */
-        .review-card a {
-            text-decoration: none;
-            color: inherit; /* 부모 요소의 색상 상속 */
-            transition: color 0.2s ease; /* 색상 변화에 부드러운 전환 효과 */
-        }
-
-        .review-card a:hover {
-            color: #007bff; /* 호버 시 색상 변경 */
-        }
-
-        .review-datetime {
-            word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div th:each="review : ${rList}" class="review-card">
-        <a th:href="'/review/reviewInfo?reviewSeq=' + ${review.reviewSeq}"> <!-- 상세 정보 페이지로 이동하는 링크 -->
-            <img th:src="${review.imageUrl}" alt="책 이미지">
-            <div class="review-title" th:text="${review.title}">독후감 제목</div>
-            <div class="review-author" th:text="${review.userId}">이름</div>
-            <div class="star-rating" th:data-rating="${review.rating}">
-            </div>
-            <br>
-            <div class="review-datetime" th:text="${review.regDt}">날짜</div>
-        </a>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var starRatings = document.querySelectorAll('.star-rating');
-
-        starRatings.forEach(function(ratingElement) {
-            var rating = ratingElement.getAttribute('data-rating');
-            if (rating) {
-                displayRatingStars(parseInt(rating), ratingElement);
+            // 로그인 상태에 따라 버튼을 표시하거나 숨기는 함수
+            function displayButtons(isLoggedIn) {
+                if (isLoggedIn) {
+                    // 로그인 상태인 경우 - 마이페이지와 로그아웃 버튼 표시
+                    $("#mypageButton").show();
+                    reButton
+                    $("#btnLogout").show();
+                    $("#loginButton").hide(); // 로그인 버튼 숨김
+                    $("#reButton").hide(); // 로그인 버튼 숨김
+                } else {
+                    // 로그인 상태가 아닌 경우 - 마이페이지와 로그아웃 버튼 숨김, 현재의 로그인 버튼 표시
+                    $("#mypageButton").hide();
+                    $("#btnLogout").hide();
+                    $("#loginButton").show(); // 로그인 버튼 표시
+                    $("#reButton").show(); // 로그인 버튼 표시
+                }
             }
+
+            // 로그아웃 버튼 클릭 시 로그아웃 함수 실행
+            $("#btnLogout").on("click", function () {
+                logOut();
+            });
+
+
+            // 로그아웃 함수
+            function logOut() {
+                $.ajax({
+                    url: "/user/logout",
+                    type: "post", // 전송방식은 Post
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    success: function (json) {
+                        if (json.result === 1) { // 로그아웃 성공
+                            alert(json.msg); // 메시지 띄우기
+                            location.href = "/main/index"; // 메인화면으로 이동
+                        } else { // 로그인 실패
+                            alert(json.msg); // 메시지 띄우기
+                        }
+                    }
+                })
+            }
+
+            // 페이지 로드 시 버튼 표시 여부 설정
+            displayButtons(isLoggedIn);
         });
-    });
 
-    // 별점을 표시하는 함수
-    function displayRatingStars(rating, container) {
-        container.innerHTML = ''; // 이전에 생성된 요소를 지웁니다.
-        for (var i = 1; i <= 5; i++) {
-            var star = document.createElement('span');
-            star.classList.add('star');
-            star.textContent = '☆';
-            if (i <= rating) {
-                star.classList.add('filled');
-                star.textContent = '★';
+    </script>
+
+</head>
+
+<body class="d-flex flex-column h-100 bg-light">
+<main class="flex-shrink-0">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+        <div class="container px-5">
+            <a class="navbar-brand" href="../main/index"><span class="fw-bolder text-primary">My Library</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
+                    <li class="nav-item"><a class="nav-link" href="/notice/noticeList">게시판</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/calendar/info">일정</a></li>
+                    <li class="nav-item"><a class="nav-link" href="search/book">도서</a></li>
+                    <li class="nav-item"><a class="nav-link" href="plan">목표</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/library/search">도서관 찾기</a></li>
+                    <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
+                    <li class="nav-item"><a id="reButton" class="nav-link" href="/user/userRegForm">회원가입</a></li>
+                    <li class="nav-item"><a id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section class="py-5">
+
+        <!DOCTYPE html>
+        <html lang="ko">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>독후감 리스트</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f5f5f5;
+                    margin: 0;
+                    padding: 20px;
+                    position: relative; /* 우측 상단 버튼 위치를 위해 추가 */
+                }
+
+                .container {
+                    width: 80%;
+                    margin: 0 auto;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 60px;
+                    justify-content: center;
+                }
+
+                .review-card {
+                    background-color: #fff;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    padding: 16px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 250px;
+                    box-sizing: border-box;
+                    transition: transform 0.2s ease-in-out;
+                    text-align: center; /* 모든 텍스트 요소를 가운데 정렬 */
+                }
+
+                .review-card:hover {
+                    transform: scale(1.05);
+                }
+
+                .review-card img {
+                    border-radius: 8px;
+                    width: 150px;
+                    height: auto;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    display: block;
+                    margin: 0 auto; /* 이미지를 중앙에 정렬 */
+                }
+
+                .review-title {
+                    font-size: 1.5em;
+                    margin: 10px 0;
+                    word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
+                }
+
+                .review-author {
+                    font-size: 1.2em;
+                    margin: 5px 0;
+                    color: #555;
+                    word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
+                }
+
+                .star-rating {
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 10px;
+                }
+
+                .star {
+                    font-size: 24px;
+                    color: hsl(60, 80%, 45%);
+                    cursor: pointer;
+                    margin: 0 2px;
+                }
+
+                .star.filled {
+                    color: hsl(45, 80%, 55%);
+                }
+
+                /* 링크 스타일 */
+                .review-card a {
+                    text-decoration: none; /* 링크에 밑줄을 제거 */
+                    color: inherit; /* 부모 요소의 색상 상속 */
+                    transition: color 0.2s ease; /* 색상 변화에 부드러운 전환 효과 */
+                }
+
+                .review-card a:hover {
+                    color: #007bff; /* 호버 시 색상 변경 */
+                }
+
+                .review-datetime {
+                    word-wrap: break-word; /* 긴 단어가 줄바꿈 되도록 */
+                    margin-top: 10px;
+                }
+
+                /* 우측 상단 독후감 쓰기 버튼 스타일 */
+                .btn-write {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 30px;
+                    font-size: 18px;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    background-color: #007bff;
+                    cursor: pointer;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    transition: background-color 0.2s, transform 0.2s;
+                    text-decoration: none; /* 링크에 밑줄을 제거 */
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .btn-write:hover {
+                    background-color: #0056b3;
+                    transform: translateY(-3px);
+                }
+            </style>
+        </head>
+        <body>
+        <div class="container">
+            <div th:each="review : ${rList}" class="review-card">
+                <a th:href="'/review/reviewInfo?reviewSeq=' + ${review.reviewSeq}"> <!-- 상세 정보 페이지로 이동하는 링크 -->
+                    <img th:src="${(review.imageUrl == null or review.imageUrl == '') ? '../assets/dist/book_icon.png' : review.imageUrl}"
+                         alt="책 이미지">
+                    <div class="review-title" th:text="${review.title}">독후감 제목</div>
+                    <div class="review-author" th:text="${review.userId}">이름</div>
+                    <div class="star-rating" th:data-rating="${review.rating}">
+                    </div>
+                    <br>
+                    <div class="review-datetime" th:text="${review.regDt}">날짜</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 우측 상단 독후감 쓰기 버튼 -->
+        <a class="btn-write" href="/review/reviewReg">독후감 작성</a>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var starRatings = document.querySelectorAll('.star-rating');
+
+                starRatings.forEach(function (ratingElement) {
+                    var rating = ratingElement.getAttribute('data-rating');
+                    if (rating) {
+                        displayRatingStars(parseInt(rating), ratingElement);
+                    }
+                });
+            });
+
+            // 별점을 표시하는 함수
+            function displayRatingStars(rating, container) {
+                container.innerHTML = ''; // 이전에 생성된 요소를 지웁니다.
+                for (var i = 1; i <= 5; i++) {
+                    var star = document.createElement('span');
+                    star.classList.add('star');
+                    star.textContent = '☆';
+                    if (i <= rating) {
+                        star.classList.add('filled');
+                        star.textContent = '★';
+                    }
+                    container.appendChild(star);
+                }
             }
-            container.appendChild(star);
-        }
-    }
-</script>
+        </script>
+        </body>
+        </html>
+    </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

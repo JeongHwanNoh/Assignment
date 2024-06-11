@@ -13,7 +13,7 @@
         }
 
         .container {
-            width: 80%;
+            width: 40%;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
@@ -27,8 +27,9 @@
             margin-bottom: 20px;
         }
 
+
         .book-image img {
-            max-width: 100%;
+            max-width: 200px;
             height: auto;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -52,7 +53,7 @@
 
         .review-content {
             margin: 20px 0;
-            padding: 20px;
+            padding: 30px;
             font-size: 1.2em;
             line-height: 1.6;
             color: #333;
@@ -60,13 +61,12 @@
             border-radius: 8px;
             background-color: #fafafa;
             text-align: left;
-            width: 60%;
+            width: 90%;
             margin: 0 auto;
             min-height: 200px; /* 최소 높이 설정 */
             max-height: 1000px; /* 최대 높이 설정 */
             overflow-y: auto; /* 필요시 수직 스크롤 표시 */
         }
-
 
         .star-rating {
             display: flex;
@@ -110,30 +110,40 @@
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
         const reviewSeq = [[${rDTO.reviewSeq}]];
+        const session_user_id = [[${session.SS_USER_ID}]];
+        const user_id = [[${rDTO.userId}]];
     </script>
     <script>
-        function deleteReview() {
-            if (confirm('정말로 이 독후감을 삭제하시겠습니까?')) {
-                $.ajax({
-                    url: '/review/reviewDelete',
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {"reviewSeq": reviewSeq}, // 폼 데이터로 전송
-                    success: function(response) {
-                        alert(response.msg);
-                        location.href = "/review/reviewList"; // 페이지 새로고침
-                    },
-                    error: function(xhr, status, error) {
-                        alert('삭제에 실패하였습니다.');
-                    }
-                });
+        function doEdit() {
+            if (session_user_id === user_id) {
+                location.href = "/review/reviewEditInfo?reviewSeq=" + reviewSeq;
+            } else if (session_user_id === "") {
+                alert("로그인 후 이용해주세요.");
+            } else {
+                alert("본인이 작성한 독후감만 수정 가능합니다.");
             }
         }
 
-        function editReview() {
-            // 현재 상세보기 페이지의 독후감 번호를 가져와 변수에 저장합니다.
-            var reviewSeq = [[${rDTO.reviewSeq}]];
-            location.href = "/review/reviewEditInfo?reviewSeq=" + reviewSeq;
+        function doDelete() {
+            if (session_user_id === user_id) {
+                if (confirm('정말로 이 독후감을 삭제하시겠습니까?')) {
+                    $.ajax({
+                        url: '/review/reviewDelete',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {"reviewSeq": reviewSeq}, // 폼 데이터로 전송
+                        success: function (response) {
+                            alert(response.msg);
+                            location.href = "/review/reviewList"; // 페이지 새로고침
+                        },
+                        error: function (xhr, status, error) {
+                            alert('삭제에 실패하였습니다.');
+                        }
+                    });
+                }
+            } else {
+                alert("본인이 작성한 독후감만 삭제 가능합니다.");
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -145,7 +155,13 @@
                     displayRatingStars(parseInt(rating), ratingElement);
                 }
             });
+
+            // 수정 버튼 이벤트 리스너 추가
+            document.getElementById('doEdit').addEventListener('click', doEdit);
+
+            document.getElementById('doDelete').addEventListener('click', doDelete);
         });
+
 
         // 별점을 표시하는 함수
         function displayRatingStars(rating, container) {
@@ -166,7 +182,7 @@
 <body>
 <div th:each="review : ${rDTO}" class="container">
     <div class="book-image">
-        <img th:src="${review.imageUrl}" alt="책 이미지">
+        <img th:src="${(review.imageUrl == null or review.imageUrl == '') ? '../assets/dist/book_icon.png' : review.imageUrl}" alt="책 이미지">
     </div>
     <div class="book-details">
         <h2 th:text="${review.title}">책 제목</h2>
@@ -179,8 +195,8 @@
     <div class="star-rating" th:data-rating="${review.rating}"></div>
     <div class="button-group">
         <!-- 수정된 부분: reviewSeq 값을 직접 전달하는 것이 아니라 JavaScript 변수로 할당된 값을 사용합니다. -->
-        <button onclick="editReview()">수정</button>
-        <button onclick="deleteReview()">삭제</button>
+        <button id="doEdit" type="button">수정</button>
+        <button id="doDelete" type="button">삭제</button>
     </div>
 </div>
 </body>
