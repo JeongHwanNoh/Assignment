@@ -47,7 +47,7 @@
             background-color: #0056b3;
         }
 
-        .results {
+        .results, .wishlist {
             max-width: 800px;
             margin: 20px auto;
             background-color: white;
@@ -56,41 +56,39 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .results h2 {
+        .results h2, .wishlist h2 {
             color: #333;
             margin-top: 0;
         }
 
-        .results ul {
+        .results ul, .wishlist ul {
             list-style: none;
             padding: 0;
         }
 
-        .results li {
+        .results li, .wishlist li {
             display: flex;
             align-items: flex-start;
             padding: 10px 0;
             border-bottom: 1px solid #eee;
         }
 
-        .results li:last-child {
+        .results li:last-child, .wishlist li:last-child {
             border-bottom: none;
         }
 
-        .results img {
+        .results img, .wishlist img {
             margin-right: 20px;
             border-radius: 4px;
-            cursor: pointer;
         }
 
-        .results .details {
+        .results .details, .wishlist .details {
             max-width: calc(100% - 120px);
         }
 
-        .results .details span {
+        .results .details span, .wishlist .details span {
             display: block;
             margin-bottom: 5px;
-            cursor: pointer;
         }
     </style>
     <script>
@@ -104,11 +102,30 @@
     </script>
 </head>
 <body>
+
 <h1>책 검색</h1>
 <form action="/review/searchpop" method="get">
     <input type="text" name="keyword" placeholder="검색어 입력" value="">
     <button type="submit">검색</button>
 </form>
+
+<div class="wishlist">
+    <h2>찜한 책 목록</h2>
+    <div th:if="${not #lists.isEmpty(rList)}">
+        <ul>
+            <li th:each="book : ${rList}" onclick="selectBook(this)">
+                <img th:src="${book.imageUrl}" th:alt="${book.title}" style="width: 100px; height: auto;">
+                <div class="details">
+                    <span>제목: <strong th:text="${book.title}"></strong></span>
+                    <span>저자: <strong th:text="${book.author}"></strong></span>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div th:if="${#lists.isEmpty(rList)}">
+        <p>찜한 책이 없습니다.</p>
+    </div>
+</div>
 
 <div class="results">
     <h2>검색 결과</h2>

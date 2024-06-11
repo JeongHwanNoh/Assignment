@@ -99,9 +99,9 @@
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
                     <li class="nav-item"><a class="nav-link" href="/notice/noticeList">게시판</a></li>
                     <li class="nav-item"><a class="nav-link" href="/calendar/info">일정</a></li>
-                    <li class="nav-item"><a class="nav-link" href="search/book">도서</a></li>
-                    <li class="nav-item"><a class="nav-link" href="plan">목표</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/search/book">도서</a></li>
                     <li class="nav-item"><a class="nav-link" href="/library/search">도서관 찾기</a></li>
+                    <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/mypage">마이페이지</a></li>
                     <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
                     <li class="nav-item"><a id="reButton" class="nav-link" href="/user/userRegForm">회원가입</a></li>
                     <li class="nav-item"><a id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
@@ -251,8 +251,11 @@
             </div>
         </div>
 
-        <!-- 우측 상단 독후감 쓰기 버튼 -->
-        <a class="btn-write" href="/review/reviewReg">독후감 작성</a>
+
+        <!-- 수정된 부분: 로그인한 경우에만 독후감 작성 페이지로 이동할 수 있도록 조건을 추가합니다. -->
+        <a class="btn-write" th:if="${SS_USER_ID != null}" href="/review/reviewReg">독후감 작성</a>
+        <a class="btn-write" th:if="${SS_USER_ID == null}" href="#" onclick="alert('로그인 후 이용해주세요.'); return false;">독후감 작성</a>
+
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {

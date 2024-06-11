@@ -161,13 +161,13 @@
         <div class="form-group">
             <label for="book-title">책 제목</label>
             <div style="display: flex; align-items: center;">
-                <input type="text" id="book-title" name="title" readonly th:value="${review.title}">
+                <input type="text" id="book-title" name="title" th:value="${review.title}">
                 <button type="button" onclick="openSearchPopup()">책 검색</button>
             </div>
         </div>
         <div class="form-group">
             <label for="book-author">저자</label>
-            <input type="text" id="book-author" name="author" readonly th:value="${review.author}">
+            <input type="text" id="book-author" name="author" th:value="${review.author}">
         </div>
         <div class="form-group">
             <img id="book-image" alt="책 이미지" th:src="${review.imageUrl}">

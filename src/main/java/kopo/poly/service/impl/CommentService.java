@@ -3,20 +3,18 @@ package kopo.poly.service.impl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kopo.poly.dto.CommentDTO;
-import kopo.poly.dto.NoticeDTO;
 import kopo.poly.repository.CommentRepository;
-import kopo.poly.repository.NoticeRepository;
 import kopo.poly.repository.entity.CommentEntity;
-import kopo.poly.repository.entity.NoticeEntity;
+import kopo.poly.repository.entity.CommentPK;
 import kopo.poly.service.ICommentService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,12 +23,17 @@ public class CommentService implements ICommentService {
 
     private final CommentRepository commentRepository;
 
+
     @Override
-    public List<CommentDTO> getCommentList() {
+    public List<CommentDTO> getCommentList(CommentDTO pDTO) {
 
         log.info(this.getClass().getName() + ".getCommentList Start!");
 
-        List<CommentEntity> rList = commentRepository.findAllByOrderByCommentSeqDesc();
+        Long noticeSeq = pDTO.noticeSeq();
+
+        log.info("noticeSeq : " + noticeSeq);
+
+        List<CommentEntity> rList = commentRepository.findByNoticeSeqOrderByCommentSeqAsc(noticeSeq);
 
         List<CommentDTO> nList = new ObjectMapper().convertValue(rList,
                 new TypeReference<>() {
@@ -41,71 +44,111 @@ public class CommentService implements ICommentService {
         return nList;
     }
 
-    @Transactional
     @Override
-    public void updateCommentInfo(CommentDTO pDTO) {
+    public int updateComment(CommentDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".updateCommentInfo Start!");
+        log.info(this.getClass().getName() + ".updateComment Start!");
 
         Long noticeSeq = pDTO.noticeSeq();
         Long commentSeq = pDTO.commentSeq();
 
-        String comment = CmmUtil.nvl(pDTO.comment());
-        String userId = CmmUtil.nvl(pDTO.userId());
+        CommentPK commentPK = CommentPK.builder()
+                .noticeSeq(noticeSeq)
+                .commentSeq(commentSeq)
+                .build();
+
+        int res = 0;
+
+        Optional<CommentEntity> rEntity = commentRepository.findById(commentPK);
+
+        if(rEntity.isPresent()){
+
+            String userId = pDTO.userId();
+            String comment = pDTO.comment();
+            String chgDt = DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss");
+            String regDt = rEntity.get().getRegDt();
+
+            log.info("noticeSeq : " + noticeSeq);
+            log.info("commentSeq : " + commentSeq);
+            log.info("userId : " + userId);
+            log.info("comment : " + comment);
+            log.info("chgDt : " + chgDt);
+
+            // 댓글 내용 DB에 저장 Update
+            CommentEntity pEntity = CommentEntity.builder()
+                    .noticeSeq(noticeSeq)
+                    .commentSeq(commentSeq)
+                    .userId(userId)
+                    .comment(comment)
+                    .regDt(regDt)
+                    .chgDt(chgDt)
+                    .build();
+
+            commentRepository.save(pEntity);
+
+            res = 1;
+        }
+
+        log.info(this.getClass().getName() + ".updateComment End!");
+
+        return res;
+    }
+
+
+    @Override
+    public void deleteComment(CommentDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + ".deleteComment Start!");
+
+        Long noticeSeq = pDTO.noticeSeq();
+        Long commentSeq = pDTO.commentSeq();
 
         log.info("noticeSeq : " + noticeSeq);
         log.info("commentSeq : " + commentSeq);
-        log.info("comment : " + comment);
-        log.info("userId : " + userId);
 
-        CommentEntity pEntity = CommentEntity.builder()
-                .noticeSeq(noticeSeq).commentSeq(commentSeq).userId(userId)
+        CommentPK commentPK = CommentPK.builder()
+                .noticeSeq(noticeSeq)
+                .commentSeq(commentSeq)
                 .build();
 
-        // 데이터 수정하기
-        commentRepository.save(pEntity);
+        // 데이터 삭제하기
+        commentRepository.deleteById(commentPK);
 
-        log.info(this.getClass().getName() + ".updateCommentInfo End!");
+        log.info(this.getClass().getName() + ".deleteComment End!");
 
     }
 
     @Override
-    public void deleteCommentInfo(CommentDTO pDTO) throws Exception {
+    public void insertComment(CommentDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".deleteCommentInfo Start!");
+        log.info(this.getClass().getName() + ".insertComment Start!");
 
-        Long commentSeq = pDTO.commentSeq();
-
-        log.info("commentSeq : " + commentSeq);
-
-        commentRepository.deleteById(commentSeq);
-
-
-        log.info(this.getClass().getName() + ".deleteCommentInfo End!");
-    }
-
-    @Override
-    public void insertCommentInfo(CommentDTO pDTO) throws Exception {
-
-        log.info(this.getClass().getName() + ".InsertCommentInfo Start!");
-
-        String comment = CmmUtil.nvl(pDTO.comment());
         String userId = CmmUtil.nvl(pDTO.userId());
+        String comment = CmmUtil.nvl(pDTO.comment());
+        Long noticeSeq = pDTO.noticeSeq();
+        Long commentSeq = commentRepository.getMaxCommentsSeq(noticeSeq);
 
-        log.info("comment : " + comment);
         log.info("userId : " + userId);
+        log.info("comment : " + comment);
+        log.info("noticeSeq : " + noticeSeq);
+        log.info("commentSeq : " + commentSeq);
 
         // 공지사항 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
         // JPA에 자동 증가 설정을 해놨음
         CommentEntity pEntity = CommentEntity.builder()
-                .conment(comment).userId(userId).regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
+                .noticeSeq(noticeSeq)
+                .commentSeq(commentSeq)
+                .userId(userId)
+                .comment(comment)
+                .regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .build();
 
         // 공지사항 저장하기
         commentRepository.save(pEntity);
 
-        log.info(this.getClass().getName() + ".InsertNoticeInfo End!");
+        log.info(this.getClass().getName() + ".insertComment End!");
 
     }
+
 }

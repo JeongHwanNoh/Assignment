@@ -46,7 +46,7 @@
         }
 
         .btn-group {
-            text-align: center;
+            text-align: center; /* 가운데 정렬 */
         }
 
         .btn-group button {
@@ -82,6 +82,52 @@
         #btnDelete:hover {
             background-color: #c82333;
         }
+
+        #comments {
+            margin-bottom: 20px;
+        }
+
+        #comments .comment-item {
+            margin-top: 10px;
+        }
+
+        #comments .comment-item .card-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #comments .comment-item .comment-content {
+            flex-grow: 1;
+        }
+
+        #comments .comment-item .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        #content {
+            width: calc(100% - 160px); /* Adjusted width for the button */
+            height: 30px; /* Reduced height */
+            resize: none;
+            padding: 10px;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+
+        #btnSend {
+            background-color: #ffc107;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #btnSend:hover {
+            background-color: #e0a800;
+        }
     </style>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
     <script th:inline="javascript">
@@ -102,8 +148,12 @@
 
             $("#btnDelete").on("click", function () {
                 doDelete();
-            })
-        })
+            });
+
+            $("#btnSend").on("click", function () {
+                doInsertComment();
+            });
+        });
 
         function doEdit() {
             if (session_user_id === user_id) {
@@ -119,16 +169,15 @@
             if (session_user_id === user_id) {
                 if (confirm("작성한 글을 삭제하시겠습니까?")) {
                     $.ajax({
-                            url: "/notice/noticeDelete",
-                            type: "post",
-                            dataType: "JSON",
-                            data: {"nSeq": nSeq},
-                            success: function (json) {
-                                alert(json.msg);
-                                location.href = "/notice/noticeList";
-                            }
+                        url: "/notice/noticeDelete",
+                        type: "post",
+                        dataType: "JSON",
+                        data: {"nSeq": nSeq},
+                        success: function (json) {
+                            alert(json.msg);
+                            location.href = "/notice/noticeList";
                         }
-                    )
+                    });
                 }
             } else if (session_user_id === "") {
                 alert("로그인 후 이용해주세요.");
@@ -136,6 +185,82 @@
                 alert("본인이 작성한 글만 삭제 가능합니다.");
             }
         }
+
+        function doInsertComment() {
+            const comment = $("#content").val();
+            if (!comment) {
+                alert("댓글을 입력하세요.");
+                return;
+            }
+
+            $.ajax({
+                url: "/comment/commentInsert",
+                type: "post",
+                dataType: "JSON",
+                data: {
+                    "comment": comment,
+                    "noticeSeq": nSeq
+                },
+                success: function (json) {
+                    alert(json.msg);
+                    location.href = "/notice/noticeInfo?nSeq=" + nSeq;
+                }
+            });
+        }
+
+        function EditCommentSeq(element) {
+            var commentSeq = element.getAttribute('data-comment-seq');
+            var userId = element.getAttribute('data-user-id');
+            var newComment = prompt("수정할 내용을 입력하세요:", ""); // 수정할 내용을 입력 받습니다.
+            if (newComment !== null) { // 사용자가 취소를 누르지 않은 경우에만 처리
+                if (newComment.trim() === "") { // 빈 내용인 경우 알림
+                    alert("댓글 내용을 입력하세요.");
+                } else {
+                    $.ajax({
+                        url: "/comment/commentUpdate",
+                        type: "post",
+                        dataType: "JSON",
+                        data: {
+                            "noticeSeq": nSeq,
+                            "commentSeq": commentSeq,
+                            "comment": newComment
+                        },
+                        success: function (json) {
+                            alert(json.msg);
+                            location.reload(); // 성공적으로 처리된 경우 페이지를 다시 로드하여 댓글을 업데이트합니다.
+                        }
+                    });
+                }
+            }
+        }
+
+        function DeleteCommentSeq(element) {
+            var commentSeq = element.getAttribute('data-comment-seq');
+            var userId = element.getAttribute('data-user-id');
+            if (session_user_id === userId) {
+                if (confirm("작성한 댓글을 삭제하시겠습니까?")) {
+                    $.ajax({
+                        url: "/comment/commentDelete",
+                        type: "post",
+                        dataType: "JSON",
+                        data: {
+                            "commentSeq": commentSeq,
+                            "noticeSeq": nSeq,
+                            "userId": userId
+                        },
+                        success: function (json) {
+                            alert(json.msg);
+                            location.href = "/notice/noticeInfo?nSeq=" + nSeq;
+                        }
+                    });
+                }
+            } else if (session_user_id === "") {
+                alert("로그인 하시길 바랍니다.");
+            } else {
+                alert("본인이 작성한 글만 삭제 가능합니다.");
+            }
+        }
+
         /*]]>*/
     </script>
 </head>
@@ -158,10 +283,44 @@
         <h3>내용</h3>
         <p th:text="${rDTO.contents}"></p>
     </div>
+    <hr>
+
     <div class="btn-group">
         <button id="btnEdit" type="button">수정</button>
         <button id="btnDelete" type="button">삭제</button>
         <button id="btnList" type="button">목록</button>
+    </div>
+
+</div>
+<!-- 댓글 입력 폼 -->
+<div class="card my-4" style="box-shadow: none;">
+    <div class="card-body">
+        <form name="f" id="f">
+            <div class="form-group" style="display: flex; align-items: center;">
+                <textarea class="form-control" name="content" id="content" style="flex: 1;" rows="1" placeholder="댓글을 입력하세요." required></textarea>
+                <button id="btnSend" type="button" class="btn btn-warning" style="margin-left: 10px;">작성</button>
+            </div>
+            <input type="hidden" name="noticeSeq" th:value="${rDTO.noticeSeq}"/>
+        </form>
+    </div>
+</div>
+
+<!-- 댓글 목록 -->
+<div id="comments">
+    <div th:each="dto : ${rList}" class="comment-item">
+        <div class="card card-body mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="comment-content">
+                    <h5 class="mb-0" th:text="${dto.userId}">작성자 이름</h5>
+                    <p class="mb-0" style="white-space: pre-wrap;" th:text="${dto.comment}">댓글 내용</p>
+                    <p class="mb-0" th:text="${dto.regDt}">작성 시간</p>
+                </div>
+                <div class="btn-group" th:if="${dto.userId eq session.SS_USER_ID}">
+                    <button type="button" class="btn btn-sm btn-primary" th:onclick="'EditCommentSeq(this)'" th:attr="data-comment-seq=${dto.commentSeq}, data-user-id=${dto.userId}">수정</button>
+                    <button type="button" class="btn btn-sm btn-danger" th:onclick="'DeleteCommentSeq(this)'" th:attr="data-comment-seq=${dto.commentSeq}, data-user-id=${dto.userId}">삭제</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

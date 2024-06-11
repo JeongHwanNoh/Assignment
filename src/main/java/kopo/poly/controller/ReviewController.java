@@ -4,6 +4,7 @@ package kopo.poly.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.*;
+import kopo.poly.service.IBookService;
 import kopo.poly.service.INoticeService;
 import kopo.poly.service.IReviewService;
 import kopo.poly.util.CmmUtil;
@@ -25,9 +26,13 @@ public class ReviewController {
 
     private final IReviewService reviewService;
 
+    private final IBookService bookService;
+
     @GetMapping("/searchpop")
     public String searchpop(@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword, Model model, HttpSession session) {
         log.info(this.getClass().getName() + ".searchBook start");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
 
         List<ReviewDTO> books = Collections.emptyList();
 
@@ -38,6 +43,12 @@ public class ReviewController {
         } else {
             log.info("No keyword provided, skipping search.");
         }
+
+        List<BookDTO> rList = Optional.ofNullable(bookService.getBookList(userId))
+                .orElseGet(ArrayList::new);
+
+        model.addAttribute("SS_USER_ID", userId);
+        model.addAttribute("rList", rList);
 
         model.addAttribute("books", books);
         model.addAttribute("keyword", keyword);

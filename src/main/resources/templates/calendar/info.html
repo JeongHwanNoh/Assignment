@@ -12,6 +12,23 @@
 
     <style>
 
+        .input-span,
+        .textarea-span {
+            display: inline-block;
+            border: 1px solid #ccc;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%; /* 너비 조정 */
+            box-sizing: border-box;
+        }
+
+        .textarea-span {
+            height: 100px; /* 높이 조정 */
+            resize: none;
+        }
+
+
         .fc-day-sun a {
             color: red;
         }
@@ -48,7 +65,69 @@
             background-color: #ffffff;
             padding: 20px;
             border-radius: 5px;
+            width: 80%; /* 모달 폭을 조절 */
+            max-width: 500px; /* 최대 너비 설정 */
+            text-align: left; /* 텍스트 왼쪽 정렬 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
         }
+
+        .modal-content form {
+            margin: 0;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="date"],
+        .modal-content textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .modal-content textarea {
+            height: 150px;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            margin-right: 10px;
+        }
+
+        .modal-content button[type="submit"] {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+        }
+
+        .modal-content button[type="button"] {
+            background-color: #6c757d;
+            color: #ffffff;
+            border: none;
+        }
+
+        #eventDetailModal .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%; /* 모달 폭을 조절 */
+            max-width: 500px; /* 최대 너비 설정 */
+            text-align: left; /* 텍스트 왼쪽 정렬 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
+        }
+
+
     </style>
 </head>
 <body>
@@ -70,23 +149,26 @@
         </form>
     </div>
 </div>
-
 <!-- 모달 창 - 일정 상세 정보 및 수정 -->
 <div id="eventDetailModal" class="modal">
     <div class="modal-content">
         <h2>일정 상세 정보 및 수정</h2>
-        <p><strong>일정 제목:</strong> <span id="eventDetailTitle"></span></p>
-        <p><strong>시작 일자:</strong> <span id="eventDetailStart"></span></p>
-        <p><strong>끝 일자:</strong> <span id="eventDetailEnd"></span></p>
-        <p><strong>일정 설명:</strong> <span id="eventDetailDescription"></span></p>
-        <button id="editEvent" class="btn btn-primary">수정</button>
-        <button id="deleteEvent" class="btn btn-danger">삭제</button>
-        <button id="closeDetailModal" type="button">닫기</button>
+        <form id="eventDetailForm">
+            <label for="eventDetailTitle">일정 제목:</label>
+            <span id="eventDetailTitle" class="input-span"></span><br>
+            <label for="eventDetailStart">시작 일자:</label>
+            <span id="eventDetailStart" class="input-span"></span><br>
+            <label for="eventDetailEnd">끝 일자:</label>
+            <span id="eventDetailEnd" class="input-span"></span><br>
+            <label for="eventDetailDescription">일정 설명:</label>
+            <span id="eventDetailDescription" class="textarea-span"></span><br>
+            <button type="button" id="editEvent" class="btn btn-primary">수정</button>
+            <button id="deleteEvent" class="btn btn-danger">삭제</button>
+            <button id="closeDetailModal" type="button">닫기</button>
+        </form>
     </div>
 </div>
-
 <div id="calendar"></div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
@@ -153,6 +235,17 @@
             }
         });
 
+        document.getElementById('closeDetailModal').addEventListener('click', function () {
+            if (currentModal) {
+                currentModal.style.display = 'none';
+                document.getElementById('eventDetailTitle').textContent = '';
+                document.getElementById('eventDetailStart').textContent = '';
+                document.getElementById('eventDetailEnd').textContent = '';
+                document.getElementById('eventDetailDescription').textContent = '';
+            }
+        });
+
+
         editEventButton.addEventListener('click', function () {
             if (currentEvent) {
                 openModal('eventModal');
@@ -162,6 +255,7 @@
                 document.getElementById('eventDescription').value = currentEvent.extendedProps.description;
             }
         });
+
 
         deleteEventButton.addEventListener('click', function () {
             if (currentEvent) {
@@ -229,7 +323,6 @@
                 }
             });
         }
-
         function updateEvent(calendarSeq, eventName, eventDate, eventEndDate, eventDescription) {
             $.ajax({
                 url: "/calendar/calendarUpdate",
@@ -257,5 +350,3 @@
 </script>
 </body>
 </html>
-
-

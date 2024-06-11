@@ -10,8 +10,7 @@ public record CommentDTO(
         String comment,
         String userId, // 작성자
         String regDt, // 등록일
-        String chgDt, // 수정일
-        String userName // 등록자명
+        String chgDt
 ) {
 
 }

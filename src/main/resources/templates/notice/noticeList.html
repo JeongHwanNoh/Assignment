@@ -21,6 +21,53 @@
 
     <style>
         /* 카드 스타일 */
+
+        .card {
+            position: relative;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .card-body {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .btn-write {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 50%;
+            padding: 15px 20px;
+            color: white;
+            font-size: 18px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn-write:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+
         .card-container {
             display: flex;
             flex-wrap: wrap;
@@ -187,11 +234,12 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small fw-bolder">
                     <li class="nav-item"><a class="nav-link" href="/calendar/info">일정</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/review/reviewList">독후감</a></li>
                     <li class="nav-item"><a class="nav-link" href="/search/book">도서</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/review/reviewList">목표</a></li>
                     <li class="nav-item"><a class="nav-link" href="/library/search">도서관 찾기</a></li>
+                    <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/mypage">마이페이지</a></li>
                     <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
-                    <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/login">마이페이지</a></li>
+                    <li class="nav-item"><a id="reButton" class="nav-link" href="/user/userRegForm">회원가입</a></li>
                     <li class="nav-item"><a id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
                 </ul>
             </div>

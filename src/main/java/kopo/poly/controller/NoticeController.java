@@ -2,8 +2,10 @@ package kopo.poly.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kopo.poly.dto.CommentDTO;
 import kopo.poly.dto.MsgDTO;
 import kopo.poly.dto.NoticeDTO;
+import kopo.poly.service.ICommentService;
 import kopo.poly.service.INoticeService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +38,8 @@ public class NoticeController {
 
     // @RequiredArgsConstructor 를 통해 메모리에 올라간 서비스 객체를 Controller에서 사용할 수 있게 주입함
     private final INoticeService noticeService;
+    private final ICommentService commentService;
 
-    /**
-     * 게시판 리스트 보여주기
-     * <p>
-     * GetMapping(value = "notice/noticeList") =>  GET방식을 통해 접속되는 URL이 notice/noticeList 경우 아래 함수를 실행함
-     */
     @GetMapping(value = "noticeList")
     public String noticeList(HttpSession session, ModelMap model)
             throws Exception {
@@ -176,15 +174,27 @@ public class NoticeController {
         /*
          * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
          */
-        NoticeDTO pDTO = NoticeDTO.builder().noticeSeq(Long.parseLong(nSeq)).build();
+        NoticeDTO pDTO = NoticeDTO.builder()
+                .noticeSeq(Long.parseLong(nSeq))
+                .build();
+
+        CommentDTO cDTO = CommentDTO.builder()
+                .noticeSeq(Long.parseLong(nSeq))
+                .build();
 
         // 공지사항 상세정보 가져오기
         // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
         NoticeDTO rDTO = Optional.ofNullable(noticeService.getNoticeInfo(pDTO, true))
                 .orElseGet(() -> NoticeDTO.builder().build());
 
+        List<CommentDTO> rList = Optional.ofNullable(commentService.getCommentList(cDTO))
+                .orElseGet(() -> new ArrayList<>());
+
+        log.info("rDTO.noticeSeq : " + rDTO.noticeSeq());
+
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rDTO", rDTO);
+        model.addAttribute("rList", rList);
 
 
         log.info(this.getClass().getName() + ".noticeInfo End!");
