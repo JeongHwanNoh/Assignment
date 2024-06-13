@@ -3,14 +3,11 @@ package kopo.poly.dto;
 import lombok.Builder;
 
 @Builder
-public record BookDTO(
+public record RecommendDTO(
 
-        Long bookSeq,
 
-        String userId,
         String title,
         String author,
-        String description,
         String imageUrl,
 
         String isbn

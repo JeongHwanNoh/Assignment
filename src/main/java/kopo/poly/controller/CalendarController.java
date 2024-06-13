@@ -43,8 +43,12 @@ public class CalendarController {
      */
     @GetMapping(value = "info")
     public String calendarinfo(HttpSession session, ModelMap model) throws Exception {
-        // 로그 찍기: 일정 데이터를 컨트롤러로 제대로 가져오는지 확인합니다.
-        log.info("Fetching calendar data from the database...");
+
+        String SS_USER_ID = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("SS_USER_ID", SS_USER_ID);
+
+        log.info("SS_USER_ID : " + SS_USER_ID);
 
         // 세션에서 사용자 아이디 가져오기
         String userId = (String) session.getAttribute("SS_USER_ID");

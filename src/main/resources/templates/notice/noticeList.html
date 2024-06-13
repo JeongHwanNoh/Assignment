@@ -163,16 +163,18 @@
                 if (isLoggedIn) {
                     // 로그인 상태인 경우 - 마이페이지와 로그아웃 버튼 표시
                     $("#mypageButton").show();
+                    reButton
                     $("#btnLogout").show();
                     $("#loginButton").hide(); // 로그인 버튼 숨김
+                    $("#reButton").hide(); // 로그인 버튼 숨김
                 } else {
                     // 로그인 상태가 아닌 경우 - 마이페이지와 로그아웃 버튼 숨김, 현재의 로그인 버튼 표시
                     $("#mypageButton").hide();
                     $("#btnLogout").hide();
                     $("#loginButton").show(); // 로그인 버튼 표시
+                    $("#reButton").show(); // 로그인 버튼 표시
                 }
             }
-
             // 로그아웃 버튼 클릭 시 로그아웃 함수 실행
             $("#btnLogout").on("click", function () {
                 logOut();

@@ -233,12 +233,53 @@
                     background-color: #0056b3;
                     transform: translateY(-3px);
                 }
+
+                .search-container {
+                    margin-bottom: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%; /* 검색창이 가로폭 전체를 차지하도록 수정 */
+                }
+
+                .search-container input[type="text"] {
+                    padding: 10px;
+                    width: calc(50% - 100px); /* 검색창이 전체 가로폭에서 버튼 너비를 제외한 크기를 가지도록 수정 */
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    margin-right: 10px;
+                }
+
+                .search-container button {
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 4px;
+                    background-color: #007bff;
+                    color: #fff;
+                    cursor: pointer;
+                }
+
+                .search-container button:hover {
+                    background-color: #0056b3;
+                }
+
+                /* 추가된 스타일 */
+                .no-result-msg {
+                    text-align: center;
+                    margin-top: 20px;
+                    color: #555;
+                }
             </style>
         </head>
         <body>
         <div class="container">
-            <div th:each="review : ${rList}" class="review-card">
-                <a th:href="'/review/reviewInfo?reviewSeq=' + ${review.reviewSeq}"> <!-- 상세 정보 페이지로 이동하는 링크 -->
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="검색어 입력" onkeypress="return searchKeyPress(event)">
+                <button onclick="searchReviews()">검색</button>
+            </div>
+            <br>
+            <div th:each="review : ${rList}" class="review-card" id="review-card">
+                <a th:href="'/review/reviewInfo?reviewSeq=' + ${review.reviewSeq}">
                     <img th:src="${(review.imageUrl == null or review.imageUrl == '') ? '../assets/dist/book_icon.png' : review.imageUrl}"
                          alt="책 이미지">
                     <div class="review-title" th:text="${review.title}">독후감 제목</div>
@@ -249,15 +290,49 @@
                     <div class="review-datetime" th:text="${review.regDt}">날짜</div>
                 </a>
             </div>
+            <!-- 로그인 상태에 따른 독후감 작성 버튼 -->
+            <a class="btn-write" th:if="${SS_USER_ID != null}" href="/review/reviewReg">독후감 작성</a>
+            <a class="btn-write" th:if="${SS_USER_ID == null}" href="#"
+               onclick="alert('로그인 후 이용해주세요.'); return false;">독후감 작성</a>
+            <div class="no-result-msg" id="noResultMsg" style="display: none;">정보가 없습니다.</div>
         </div>
 
-
-        <!-- 수정된 부분: 로그인한 경우에만 독후감 작성 페이지로 이동할 수 있도록 조건을 추가합니다. -->
-        <a class="btn-write" th:if="${SS_USER_ID != null}" href="/review/reviewReg">독후감 작성</a>
-        <a class="btn-write" th:if="${SS_USER_ID == null}" href="#" onclick="alert('로그인 후 이용해주세요.'); return false;">독후감 작성</a>
-
-
         <script>
+            // 검색 기능을 수행하는 함수
+            function searchReviews() {
+                var searchInput = document.getElementById('searchInput').value.toLowerCase();
+                var reviewCards = document.querySelectorAll('.review-card');
+                var noResultMsg = document.getElementById('noResultMsg');
+
+                reviewCards.forEach(function (reviewCard) {
+                    var reviewTitle = reviewCard.querySelector('.review-title').innerText.toLowerCase();
+                    var reviewAuthor = reviewCard.querySelector('.review-author').innerText.toLowerCase();
+
+                    if (reviewTitle.includes(searchInput) || reviewAuthor.includes(searchInput)) {
+                        reviewCard.style.display = 'block';
+                    } else {
+                        reviewCard.style.display = 'none';
+                    }
+                });
+
+                var visibleReviewCards = document.querySelectorAll('.review-card[style="display: block;"]');
+                if (visibleReviewCards.length === 0) {
+                    noResultMsg.style.display = 'block';
+                } else {
+                    noResultMsg.style.display = 'none';
+                }
+            }
+
+            // Enter 키를 눌렀을 때 검색 실행
+            function searchKeyPress(e) {
+                // 엔터 키의 keyCode 값은 13입니다.
+                if (e.keyCode === 13) {
+                    searchReviews();
+                    return false; // 폼 전송 방지
+                }
+                return true;
+            }
+
             document.addEventListener('DOMContentLoaded', function () {
                 var starRatings = document.querySelectorAll('.star-rating');
 
@@ -284,8 +359,11 @@
                 }
             }
         </script>
+
         </body>
         </html>
+
+
     </section>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>

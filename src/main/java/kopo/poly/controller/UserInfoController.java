@@ -212,6 +212,8 @@ public class UserInfoController {
         // 세션에서 사용자 아이디 가져오기
         String userId = (String) session.getAttribute("SS_USER_ID");
 
+        String SS_USER_ID = (String) session.getAttribute("SS_USER_ID");
+
         log.info("User ID: " + userId);
 
 
@@ -220,6 +222,8 @@ public class UserInfoController {
                 .orElseGet(ArrayList::new);
 
 
+
+        model.addAttribute("SS_USER_ID", SS_USER_ID);
 
         // 모델에 복호화된 사용자 정보 리스트 추가
         model.addAttribute("rList", rList);
