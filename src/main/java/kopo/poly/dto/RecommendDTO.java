@@ -2,15 +2,17 @@ package kopo.poly.dto;
 
 import lombok.Builder;
 
+import java.io.Serializable;
+
 @Builder
 public record RecommendDTO(
 
 
         String title,
         String author,
-        String imageUrl,
+        String image,
 
         String isbn
 
-) {
+) implements Serializable {
 }

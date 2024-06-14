@@ -159,29 +159,36 @@
 
     </style>
     <script>
-        function setBookInfo(title, author, imageUrl) {
-            document.getElementById('book-title').value = title;
-            document.getElementById('book-author').value = author;
-            var bookImage = document.getElementById('book-image');
-            bookImage.src = imageUrl;
-            bookImage.style.display = 'block';
-        }
-
-        function openSearchPopup() {
-            window.open('/review/searchpop', '책 검색', 'width=600,height=400');
-        }
-
-        function cancel() {
-            if (confirm("작성을 취소하시겠습니까?")) {
-                window.history.back();
-            }
-        }
-
         function submitForm(event) {
             event.preventDefault();
-            var formData = new FormData(document.getElementById('reviewForm'));
 
-            // 이미지 URL 추가
+            // 필수 입력 항목 체크
+            var title = document.getElementById('book-title').value.trim();
+            var author = document.getElementById('book-author').value.trim();
+            var contents = document.getElementById('review').value.trim();
+            var rating = document.querySelector('.star-rating input:checked');
+
+            if (!title) {
+                alert('책 제목을 입력해주세요.');
+                return;
+            }
+
+            if (!author) {
+                alert('저자를 입력해주세요.');
+                return;
+            }
+
+            if (!contents) {
+                alert('독후감 내용을 입력해주세요.');
+                return;
+            }
+
+            if (!rating) {
+                alert('평점을 선택해주세요.');
+                return;
+            }
+
+            var formData = new FormData(document.getElementById('reviewForm'));
             var imageUrl = document.getElementById('book-image').src;
             formData.append('imageUrl', imageUrl);
 
@@ -201,12 +208,31 @@
             xhr.send(formData);
         }
 
+        function cancel() {
+            if (confirm("작성을 취소하시겠습니까?")) {
+                window.history.back();
+            }
+        }
+
+        function setBookInfo(title, author, imageUrl) {
+            document.getElementById('book-title').value = title;
+            document.getElementById('book-author').value = author;
+            var bookImage = document.getElementById('book-image');
+            bookImage.src = imageUrl;
+            bookImage.style.display = 'block';
+        }
+
+        function openSearchPopup() {
+            window.open('/review/searchpop', '책 검색', 'width=600,height=400');
+        }
+
         function selectBook(element, imageUrl) {
             var title = element.querySelector('.details span:first-child strong').textContent;
             var author = element.querySelector('.details span:last-child strong').textContent;
             setBookInfo(title, author, imageUrl);
         }
     </script>
+
 </head>
 <body>
 <div class="container">

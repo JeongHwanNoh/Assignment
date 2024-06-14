@@ -272,54 +272,6 @@
     </div>
 </div>
 
-<!-- 댓글 작성 섹션 -->
-<div class="comment-section">
-    <h3>댓글 작성</h3>
-    <div class="comment-form">
-        <textarea id="commentContent" placeholder="댓글을 입력하세요."></textarea>
-        <button id="submitComment" onclick="submitComment()">댓글 작성</button>
-    </div>
-</div>
-
-<!-- 댓글 목록 -->
-<div class="comment-section">
-    <h3>댓글 목록</h3>
-    <div class="comment-list" id="commentList">
-        <div class="comment-item">
-            <h4>댓글 작성자</h4>
-            <p>댓글 내용</p>
-            <div class="comment-date">작성일</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function submitComment() {
-        const commentContent = document.getElementById('commentContent').value;
-        if (commentContent.trim() === '') {
-            alert('댓글 내용을 입력해주세요.');
-            return;
-        }
-
-        // AJAX 요청을 통해 댓글을 서버로 전송합니다.
-        $.ajax({
-            url: '/comment/commentInsert',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                "reviewSeq": reviewSeq,
-                "content": commentContent
-            },
-            success: function (response) {
-                alert(response.msg);
-                // 댓글 목록을 갱신하거나 페이지를 새로고침합니다.
-                location.reload();
-            },
-            error: function (xhr, status, error) {
-                alert('댓글 작성에 실패하였습니다.');
-            }
-        });
-    }
 </script>
 </body>
 </html>
