@@ -103,8 +103,8 @@ public class RecommendService implements IRecommendService {
         }
     }
     private String getRandomKeyword() {
-        String[] keywords = {"소설", "경제", "역사", "자기계발", "과학"};
-        String[] bookRelatedKeywords = {"소설", "경제", "역사", "자기계발", "과학"};
+        String[] keywords = {"경제", "역사", "자기계발", "과학"};
+        String[] bookRelatedKeywords = {"경제", "역사", "자기계발", "과학"};
 
         int randomIndex = ThreadLocalRandom.current().nextInt(keywords.length);
         String keyword = keywords[randomIndex];
