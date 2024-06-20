@@ -117,6 +117,35 @@
             <meta charset="utf-8">
             <title>도서관 검색</title>
             <style>
+
+                .option form {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+
+                .option input[type="text"] {
+                    flex: 1;
+                    padding: 8px;
+                    font-size: 14px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px 0 0 5px;
+                }
+
+                .option button[type="submit"] {
+                    padding: 8px 15px;
+                    font-size: 14px;
+                    background-color: #007bff;
+                    color: #fff;
+                    border: none;
+                    border-radius: 0 5px 5px 0;
+                    cursor: pointer;
+                }
+
+                .option button[type="submit"]:hover {
+                    background-color: #0056b3;
+                }
+
                 .map_wrap, .map_wrap * {
                     margin: 0;
                     padding: 0;
@@ -307,6 +336,126 @@
                     overflow: hidden;
                 }
 
+                <style>
+                 .map-container {
+                     display: flex;
+                     justify-content: center;
+                     align-items: center;
+                     background-color: #f0f8ff;
+                     padding: 20px;
+                     border-radius: 10px;
+                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                 }
+
+                .map_wrap {
+                    position: relative;
+                    width: 100%;
+                    max-width: 1200px;
+                    height: 600px;
+                    background-color: #fff;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                #menu_wrap {
+                    position: absolute;
+                    top: 10px;
+                    left: 10px;
+                    bottom: 10px;
+                    width: 300px;
+                    margin: 0;
+                    padding: 10px;
+                    overflow-y: auto;
+                    background: rgba(255, 255, 255, 0.9);
+                    z-index: 1;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .option form {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+
+                .option input[type="text"] {
+                    flex: 1;
+                    padding: 10px;
+                    font-size: 14px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px 0 0 5px;
+                }
+
+                .option button[type="submit"] {
+                    padding: 10px 15px;
+                    font-size: 14px;
+                    background-color: #007bff;
+                    color: #fff;
+                    border: none;
+                    border-radius: 0 5px 5px 0;
+                    cursor: pointer;
+                }
+
+                .option button[type="submit"]:hover {
+                    background-color: #0056b3;
+                }
+
+                #placesList li {
+                    list-style: none;
+                    margin-bottom: 10px;
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    background-color: #f9f9f9;
+                    cursor: pointer;
+                }
+
+                #placesList .item {
+                    position: relative;
+                }
+
+                #placesList .item h5 {
+                    margin: 0;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+
+                #placesList .item .info {
+                    margin-top: 5px;
+                }
+
+                #placesList .item .info .gray {
+                    color: #888;
+                }
+
+                #placesList .item .info .tel {
+                    color: #009900;
+                }
+
+                #pagination {
+                    margin: 10px auto;
+                    text-align: center;
+                }
+
+                #pagination a {
+                    display: inline-block;
+                    margin-right: 5px;
+                    padding: 5px 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 3px;
+                    color: #007bff;
+                    cursor: pointer;
+                }
+
+                #pagination a.on {
+                    font-weight: bold;
+                    color: #fff;
+                    background-color: #007bff;
+                    border-color: #007bff;
+                }
+            </style>
+
             </style>
         </head>
         <body>
@@ -403,7 +552,65 @@
                 menuEl.scrollTop = 0;
 
                 map.setBounds(bounds);
+
+                if (places.length === 0) {
+                    alert('검색 결과가 존재하지 않습니다.');
+                }
             }
+            function displayPlaces(places) {
+                var listEl = document.getElementById('placesList');
+                var menuEl = document.getElementById('menu_wrap');
+                var mapContainer = document.getElementById('map');
+                var fragment = document.createDocumentFragment();
+                var bounds = new kakao.maps.LatLngBounds();
+
+                removeAllChildNods(listEl);
+                removeMarker();
+
+                if (places.length === 0) {
+                    // 검색 결과가 없는 경우 지도 숨기고 메시지 표시
+                    mapContainer.style.display = 'none';
+                    alert('검색 결과가 존재하지 않습니다.');
+                    location.reload();
+                } else {
+                    // 검색 결과가 있는 경우 지도 표시
+                    mapContainer.style.display = 'block';
+
+                    for (var i = 0; i < places.length; i++) {
+                        var placePosition = new kakao.maps.LatLng(places[i].y, places[i].x);
+                        var marker = addMarker(placePosition, i);
+                        var itemEl = getListItem(i, places[i]);
+
+                        bounds.extend(placePosition);
+
+                        (function (marker, title) {
+                            kakao.maps.event.addListener(marker, 'mouseover', function () {
+                                displayInfowindow(marker, title);
+                            });
+
+                            kakao.maps.event.addListener(marker, 'mouseout', function () {
+                                infowindow.close();
+                            });
+
+                            itemEl.onmouseover = function () {
+                                displayInfowindow(marker, title);
+                            };
+
+                            itemEl.onmouseout = function () {
+                                infowindow.close();
+                            };
+                        })(marker, places[i].place_name);
+
+                        fragment.appendChild(itemEl);
+                    }
+                }
+
+                listEl.appendChild(fragment);
+                menuEl.scrollTop = 0;
+
+                map.setBounds(bounds);
+            }
+
 
             function getListItem(index, place) {
                 var el = document.createElement('li');

@@ -19,10 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
@@ -54,6 +52,8 @@ public class RecommendService implements IRecommendService {
             return cachedBooks;
         }
 
+        // 캐시에 데이터가 없으면 API를 호출하여 새로운 데이터 호출
+
         String randomKeyword = getRandomKeyword();
         String apiUrl = "https://openapi.naver.com/v1/search/book.json?query=" + randomKeyword + "&display=5";
 
@@ -66,6 +66,8 @@ public class RecommendService implements IRecommendService {
         log.info("API 요청 URL: {}", apiUrl);
         log.info("API 요청 헤더: {}", headers);
 
+        // API 응답을 JSON으로 파싱
+
         ResponseEntity<String> responseEntity = new RestTemplate().exchange(apiUrl, HttpMethod.GET, entity, String.class);
 
         log.info("API 응답 코드: {}", responseEntity.getStatusCode());
@@ -73,6 +75,7 @@ public class RecommendService implements IRecommendService {
 
         List<RecommendDTO> books = parseJsonResponse(responseEntity.getBody());
 
+        //캐시에 저장
         if (books != null) {
             log.info("책 목록 파싱 성공: {}", books);
             redisTemplate.opsForValue().set("random_books", books, redisExpireTime, TimeUnit.SECONDS);
@@ -102,6 +105,7 @@ public class RecommendService implements IRecommendService {
             return null;
         }
     }
+
     private String getRandomKeyword() {
         String[] keywords = {"경제", "역사", "자기계발", "과학"};
         String[] bookRelatedKeywords = {"경제", "역사", "자기계발", "과학"};
@@ -117,5 +121,4 @@ public class RecommendService implements IRecommendService {
 
         return keyword;
     }
-
 }

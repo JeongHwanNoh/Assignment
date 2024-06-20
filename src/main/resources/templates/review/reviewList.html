@@ -291,9 +291,13 @@
                 </a>
             </div>
             <!-- 로그인 상태에 따른 독후감 작성 버튼 -->
-            <a class="btn-write" th:if="${SS_USER_ID != null}" href="/review/reviewReg">독후감 작성</a>
+            <a class="btn-write" th:if="${SS_USER_ID != null}" href="/review/reviewReg">
+                <i class="bi bi-pencil-square"></i>
+            </a>
             <a class="btn-write" th:if="${SS_USER_ID == null}" href="#"
-               onclick="alert('로그인 후 이용해주세요.'); return false;">독후감 작성</a>
+               onclick="alert('로그인 후 이용해주세요.'); return false;">
+                <i class="bi bi-pencil-square"></i>
+            </a>
             <div class="no-result-msg" id="noResultMsg" style="display: none;">정보가 없습니다.</div>
         </div>
 
