@@ -42,6 +42,8 @@ public class ReviewService implements IReviewService {
     private final ReviewRepository reviewRepository;
     private final RestTemplate restTemplate = new RestTemplate();
 
+    //api 키
+
     @Value("${naver.client.id}")
     private String clientId;
 
@@ -52,11 +54,14 @@ public class ReviewService implements IReviewService {
     public List<ReviewDTO> searchBooks(String searchKeyword) {
         log.info(this.getClass().getName() + ".searchBook Start!");
 
+        //키워드 검색
+
         String apiUrl = "https://openapi.naver.com/v1/search/book.json?query=" + searchKeyword;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Naver-Client-Id", clientId);
         headers.set("X-Naver-Client-Secret", clientSecret);
+
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -64,11 +69,16 @@ public class ReviewService implements IReviewService {
 
         log.info("response : " + response);
 
+        //데이터 검색 후 아이템 변환
+
         List<Map<String, Object>> items = (List<Map<String, Object>>) response.getBody().get("items");
 
         log.info("items : " + items);
 
         log.info(this.getClass().getName() + ".searchBook End");
+
+
+        //검색에 맞는 데이터 추가
 
         List<ReviewDTO> bookList = items.stream().map(item -> {
             ReviewDTO book = ReviewDTO.builder()
@@ -87,6 +97,9 @@ public class ReviewService implements IReviewService {
 
     @Override
     public List<ReviewDTO> getReviewList() {
+
+
+        //독후감 작성 리스트
 
         log.info(this.getClass().getName() + ".getReviewList Start!");
 
@@ -111,7 +124,6 @@ public class ReviewService implements IReviewService {
         ReviewEntity rEntity = reviewRepository.findByReviewSeq(pDTO.reviewSeq());
 
 
-
         // 엔티티의 값들을 DTO에 맞게 넣어주기
         ReviewDTO rDTO = new ObjectMapper().convertValue(rEntity, ReviewDTO.class);
 
@@ -125,6 +137,9 @@ public class ReviewService implements IReviewService {
     @Transactional
     @Override
     public void updateReviewInfo(ReviewDTO pDTO) {
+
+
+        //수정
 
         log.info(this.getClass().getName() + ".updateReviewInfo Start!");
 
@@ -168,6 +183,8 @@ public class ReviewService implements IReviewService {
     @Override
     public void deleteReviewInfo(ReviewDTO pDTO) throws Exception {
 
+        //삭제
+
         log.info(this.getClass().getName() + ".deleteReviewInfo Start!");
 
         Long reviewSeq = pDTO.reviewSeq();
@@ -182,6 +199,8 @@ public class ReviewService implements IReviewService {
 
     @Override
     public void insertReviewInfo(ReviewDTO pDTO) throws Exception {
+
+        //독후감 추가
 
         log.info(this.getClass().getName() + ".InsertReviewInfo Start!");
 

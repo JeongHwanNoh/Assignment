@@ -41,6 +41,9 @@ public class BookController {
 
         if (!keyword.isEmpty()) {
             List<BookDTO> books = bookService.searchBooks(keyword);
+
+            //책 검색을 위한 코드와 불러오는 코드
+
             model.addAttribute("books", books);
             model.addAttribute("keyword", keyword);
         } else {
@@ -52,6 +55,8 @@ public class BookController {
     }
 
     @GetMapping("/detail")
+
+    //상세보기
     public String showBookDetail(@RequestParam("isbn") String isbn, Model model, HttpSession session) {
         log.info(this.getClass().getName() + ".showBookDetail start");
 
@@ -99,7 +104,7 @@ public class BookController {
                     .build();
 
             /*
-             * 게시글 등록하기위한 비즈니스 로직을 호출
+             * 찜하기 등록하기위한 비즈니스 로직을 호출
              */
             bookService.insertBookInfo(pDTO);
 
@@ -132,19 +137,11 @@ public class BookController {
         try {
             String bookSeq = CmmUtil.nvl(request.getParameter("bookSeq")); // 글번호(PK)
 
-            /*
-             * ####################################################################################
-             * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
-             * ####################################################################################
-             */
             log.info("bookSeq : " + bookSeq);
 
-            /*
-             * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
-             */
             BookDTO pDTO = BookDTO.builder().bookSeq(Long.parseLong(bookSeq)).build();
 
-            // 게시글 삭제하기 DB
+            // 찜하기 삭제하기 DB
             bookService.deleteBookInfo(pDTO);
 
             msg = "삭제되었습니다.";

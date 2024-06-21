@@ -24,6 +24,8 @@ public class CommentService implements ICommentService {
     private final CommentRepository commentRepository;
 
 
+
+    //댓글 리스트를 보여주는 코드
     @Override
     public List<CommentDTO> getCommentList(CommentDTO pDTO) {
 
@@ -33,6 +35,7 @@ public class CommentService implements ICommentService {
 
         log.info("noticeSeq : " + noticeSeq);
 
+        //노티스 번호에 맞는 댓글만 불러옴
         List<CommentEntity> rList = commentRepository.findByNoticeSeqOrderByCommentSeqAsc(noticeSeq);
 
         List<CommentDTO> nList = new ObjectMapper().convertValue(rList,
@@ -44,6 +47,8 @@ public class CommentService implements ICommentService {
         return nList;
     }
 
+
+    //댓글 수정
     @Override
     public int updateComment(CommentDTO pDTO) throws Exception {
 
@@ -94,7 +99,7 @@ public class CommentService implements ICommentService {
         return res;
     }
 
-
+   //댓글 삭제
     @Override
     public void deleteComment(CommentDTO pDTO) throws Exception {
 
@@ -118,6 +123,8 @@ public class CommentService implements ICommentService {
 
     }
 
+
+    //댓글 추가
     @Override
     public void insertComment(CommentDTO pDTO) throws Exception {
 
@@ -144,7 +151,7 @@ public class CommentService implements ICommentService {
                 .chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                 .build();
 
-        // 공지사항 저장하기
+        // 댓글 저장하기
         commentRepository.save(pEntity);
 
         log.info(this.getClass().getName() + ".insertComment End!");

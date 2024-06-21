@@ -106,6 +106,7 @@ public class RecommendService implements IRecommendService {
         }
     }
 
+    //랜덤 키워드를 통한 랜덤 책 데이터 검색
     private String getRandomKeyword() {
         String[] keywords = {"경제", "역사", "자기계발", "과학"};
         String[] bookRelatedKeywords = {"경제", "역사", "자기계발", "과학"};
@@ -113,7 +114,7 @@ public class RecommendService implements IRecommendService {
         int randomIndex = ThreadLocalRandom.current().nextInt(keywords.length);
         String keyword = keywords[randomIndex];
 
-        // 책과 관련된 키워드만 선택하도록 조건 추가
+        // 책과 관련된 키워드만 선택하도록 조건
         while (!Arrays.asList(bookRelatedKeywords).contains(keyword)) {
             randomIndex = ThreadLocalRandom.current().nextInt(keywords.length);
             keyword = keywords[randomIndex];

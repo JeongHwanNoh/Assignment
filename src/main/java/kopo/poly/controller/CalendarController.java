@@ -19,14 +19,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-/*
- * Controller 선언해야만 Spring 프레임워크에서 Controller인지 인식 가능
- * 자바 서블릿 역할 수행
- *
- * slf4j는 스프링 프레임워크에서 로그 처리하는 인터페이스 기술이며,
- * 로그처리 기술인 log4j와 logback과 인터페이스 역할 수행함
- * 스프링 프레임워크는 기본으로 logback을 채택해서 로그 처리함
- * */
 @Slf4j
 @RequestMapping(value = "/calendar")
 @RequiredArgsConstructor
@@ -36,11 +28,6 @@ public class CalendarController {
     // @RequiredArgsConstructor 를 통해 메모리에 올라간 서비스 객체를 Controller에서 사용할 수 있게 주입함
     private final ICalendarService calendarService;
 
-    /**
-     * 게시판 리스트 보여주기
-     * <p>
-     * GetMapping(value = "notice/noticeList") =>  GET방식을 통해 접속되는 URL이 notice/noticeList 경우 아래 함수를 실행함
-     */
     @GetMapping(value = "info")
     public String calendarinfo(HttpSession session, ModelMap model) throws Exception {
 
@@ -54,7 +41,7 @@ public class CalendarController {
         String userId = (String) session.getAttribute("SS_USER_ID");
         log.info("User ID: " + userId);
 
-        // 공지사항 리스트 조회하기
+        // 리스트 조회하기
         List<CalendarDTO> rList = Optional.ofNullable(calendarService.getCalendarList(userId))
                 .orElseGet(ArrayList::new);
 
@@ -67,13 +54,6 @@ public class CalendarController {
         return "calendar/info";
     }
 
-
-    /**
-     * 게시판 글 등록
-     * <p>
-     * 게시글 등록은 Ajax로 호출되기 때문에 결과는 JSON 구조로 전달해야만 함
-     * JSON 구조로 결과 메시지를 전송하기 위해 @ResponseBody 어노테이션 추가함
-     */
     @ResponseBody
     @PostMapping(value = "calendarInsert")
     public MsgDTO calendarInsert(HttpServletRequest request, HttpSession session) {
@@ -85,19 +65,13 @@ public class CalendarController {
         MsgDTO dto; // 결과 메시지 구조
 
         try {
-            // 로그인된 사용자 아이디를 가져오기
-            // 로그인을 아직 구현하지 않았기에 공지사항 리스트에서 로그인 한 것처럼 Session 값을 저장함
+            //캘린더 저장할 데이터들
             String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String start = CmmUtil.nvl(request.getParameter("start")); // 공지글 여부
             String end = CmmUtil.nvl(request.getParameter("end")); // 내용
             String description = CmmUtil.nvl(request.getParameter("description")); // 내용
 
-            /*
-             * ####################################################################################
-             * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
-             * ####################################################################################
-             */
             log.info("session user_id : " + userId);
             log.info("title : " + title);
             log.info("start : " + start);
@@ -108,9 +82,6 @@ public class CalendarController {
             CalendarDTO pDTO = CalendarDTO.builder().userId(userId).title(title)
                     .start(start).end(end).description(description).build();
 
-            /*
-             * 게시글 등록하기위한 비즈니스 로직을 호출
-             */
             calendarService.insertCalendarInfo(pDTO);
 
             // 저장이 완료되면 사용자에게 보여줄 메시지
@@ -153,11 +124,6 @@ public class CalendarController {
             String end = CmmUtil.nvl(request.getParameter("end")); // 내용
             String description = CmmUtil.nvl(request.getParameter("description"));
 
-            /*
-             * ####################################################################################
-             * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
-             * ####################################################################################
-             */
             log.info("userId : " + userId);
             log.info("calendarSeq : " + calendarSeq);
             log.info("title : " + title);
@@ -204,11 +170,6 @@ public class CalendarController {
         try {
             String calendarSeq = CmmUtil.nvl(request.getParameter("calendarSeq")); // 글번호(PK)
 
-            /*
-             * ####################################################################################
-             * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
-             * ####################################################################################
-             */
             log.info("calendarSeq : " + calendarSeq);
 
             /*
@@ -216,7 +177,7 @@ public class CalendarController {
              */
             CalendarDTO pDTO = CalendarDTO.builder().calendarSeq(Long.parseLong(calendarSeq)).build();
 
-            // 게시글 삭제하기 DB
+            // 캘린더 삭제하기 DB
             calendarService.deleteCalendarInfo(pDTO);
 
             msg = "삭제되었습니다.";

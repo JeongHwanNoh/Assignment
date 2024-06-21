@@ -120,9 +120,6 @@ public class CommentController {
         return dto;
     }
 
-    /**
-     * 게시판 글 삭제
-     */
     @ResponseBody
     @PostMapping(value = "commentDelete")
     public MsgDTO noticeDelete(HttpServletRequest request) {
