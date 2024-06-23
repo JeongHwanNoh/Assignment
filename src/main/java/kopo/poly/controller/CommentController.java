@@ -150,6 +150,7 @@ public class CommentController {
 
             msg = "삭제되었습니다.";
 
+
         } catch (Exception e) {
             msg = "실패하였습니다. : " + e.getMessage();
             log.info(e.toString());

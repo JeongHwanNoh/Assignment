@@ -59,3 +59,4 @@ public class UserInfoEntity implements Serializable {
     @Column(name = "GENRE", length = 100, nullable = false)
     private String genre;
 }
+

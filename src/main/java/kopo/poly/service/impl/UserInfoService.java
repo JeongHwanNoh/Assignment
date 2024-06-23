@@ -161,7 +161,6 @@ public class UserInfoService implements IUserInfoService {
         String email = CmmUtil.nvl(pDTO.email());
         String addr1 = CmmUtil.nvl(pDTO.addr1());
         String addr2 = CmmUtil.nvl(pDTO.addr2());
-        String gender = CmmUtil.nvl(pDTO.gender());
         String genre = CmmUtil.nvl(pDTO.genre());
 
         log.info("pDTO : " + pDTO);

@@ -12,19 +12,18 @@
         }
 
         .review-content {
-            width: 100%; /* 너비를 100%로 설정하여 부모 요소에 맞춥니다. */
-            height: 150px; /* 높이를 조정하여 적절한 텍스트 입력 영역을 제공합니다. */
-            padding: 10px; /* 내부 여백을 추가하여 텍스트와 테두리 사이의 간격을 설정합니다. */
-            box-sizing: border-box; /* 패딩을 포함한 전체 요소 크기를 설정합니다. */
-            font-family: 'Arial', sans-serif; /* 텍스트에 사용할 글꼴을 설정합니다. */
-            font-size: 14px; /* 텍스트의 크기를 조정합니다. */
-            border: 1px solid #ccc; /* 회색 테두리를 추가하여 텍스트 영역을 감싸도록 합니다. */
-            border-radius: 5px; /* 둥근 테두리를 추가하여 모서리를 부드럽게 만듭니다. */
-            background-color: #f8f9fa; /* 배경색을 설정하여 텍스트 입력 영역을 부각시킵니다. */
-            resize: vertical; /* 사용자가 세로 방향으로만 크기를 조정할 수 있도록 합니다. */
-            outline: none; /* 클릭 시 나타나는 기본적인 아웃라인을 제거하여 보다 깔끔하게 표시합니다. */
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            resize: vertical;
+            outline: none;
         }
-
 
         .card {
             background-color: #fff;
@@ -61,7 +60,7 @@
         }
 
         .btn-group {
-            text-align: center; /* 가운데 정렬 */
+            text-align: center;
         }
 
         .btn-group button {
@@ -122,8 +121,8 @@
         }
 
         #content {
-            width: calc(100% - 160px); /* Adjusted width for the button */
-            height: 30px; /* Reduced height */
+            width: calc(100% - 160px);
+            height: 30px;
             resize: none;
             padding: 10px;
             box-sizing: border-box;
@@ -142,6 +141,14 @@
 
         #btnSend:hover {
             background-color: #e0a800;
+        }
+
+        #btnLike {
+            background-color: #28a745;
+        }
+
+        #btnLike:hover {
+            background-color: #218838;
         }
     </style>
     <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
@@ -168,6 +175,13 @@
             $("#btnSend").on("click", function () {
                 doInsertComment();
             });
+
+            $("#btnLike").on("click", function () {
+                toggleLike();
+            });
+
+            // 페이지 로드 시 좋아요 수 가져오기
+            fetchLikeCount();
         });
 
         function doEdit() {
@@ -223,12 +237,59 @@
             });
         }
 
+        function toggleLike() {
+            $.ajax({
+                url: "/like/toggle",
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    noticeSeq: nSeq,
+                    userId: session_user_id
+                }),
+                success: function (response) {
+                    alert(response);
+                    fetchLikeCount();
+                },
+                error: function (xhr) {
+                    console.error("Error:", xhr.responseText);
+                    alert("좋아요 처리 중 오류가 발생했습니다.");
+                }
+            });
+        }
+
+        // 페이지 로드 시 좋아요 수 가져오기
+        function fetchLikeCount() {
+            $.ajax({
+                url: "/like/count",
+                type: "get",
+                data: {
+                    noticeSeq: nSeq
+                },
+                success: function (response) {
+                    $("#likeCount").text(response);
+                },
+                error: function (xhr) {
+                    console.error("Error:", xhr.responseText);
+                    alert("좋아요 수 가져오기 중 오류가 발생했습니다.");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $("#btnLike").off("click").on("click", function () {
+                $(this).prop('disabled', true); // 버튼 비활성화하여 중복 클릭 방지
+                toggleLike();
+                $(this).prop('disabled', false); // 요청 완료 후 버튼 다시 활성화
+            });
+        });
+
+
         function EditCommentSeq(element) {
             var commentSeq = element.getAttribute('data-comment-seq');
             var userId = element.getAttribute('data-user-id');
-            var newComment = prompt("수정할 내용을 입력하세요:", ""); // 수정할 내용을 입력 받습니다.
-            if (newComment !== null) { // 사용자가 취소를 누르지 않은 경우에만 처리
-                if (newComment.trim() === "") { // 빈 내용인 경우 알림
+            var newComment = prompt("수정할 내용을 입력하세요:", "");
+            if (newComment !== null) {
+                if (newComment.trim() === "") {
                     alert("댓글 내용을 입력하세요.");
                 } else {
                     $.ajax({
@@ -242,7 +303,7 @@
                         },
                         success: function (json) {
                             alert(json.msg);
-                            location.reload(); // 성공적으로 처리된 경우 페이지를 다시 로드하여 댓글을 업데이트합니다.
+                            location.reload();
                         }
                     });
                 }
@@ -275,7 +336,6 @@
                 alert("본인이 작성한 글만 삭제 가능합니다.");
             }
         }
-
         /*]]>*/
     </script>
 </head>
@@ -305,7 +365,12 @@
         <button id="btnDelete" type="button">삭제</button>
         <button id="btnList" type="button">목록</button>
     </div>
-
+    <!-- 좋아요 버튼 -->
+    <div class="btn-group" style="margin-top: 20px;">
+        <button id="btnLike" type="button" class="btn btn-light">
+            👍 <span id="likeCount">0</span>
+        </button>
+    </div>
 </div>
 <!-- 댓글 입력 폼 -->
 <div class="card my-4" style="box-shadow: none;">

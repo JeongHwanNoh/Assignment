@@ -26,6 +26,8 @@ public class CalendarService implements ICalendarService {
     public List<CalendarDTO> getCalendarList(String userId) {
         log.info("Fetching calendar data for user: {}", userId);
 
+        //userId에 맞는 일정리스트를 불러옴
+
         List<CalendarEntity> rList = calendarRepository.findAllByUserIdOrderByCalendarSeqDesc(userId);
 
         List<CalendarDTO> nList = rList.stream()
