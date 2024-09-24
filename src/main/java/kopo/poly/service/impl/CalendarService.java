@@ -109,13 +109,12 @@ public class CalendarService implements ICalendarService {
         log.info("end : " + end);
         log.info("description : " + description);
 
-
-        // JPA에 자동 증가 설정을 해놨음
+        //정보저장
         CalendarEntity pEntity = CalendarEntity.builder()
                 .title(title).userId(userId).start(start).end(end).description(description)
                 .build();
 
-        // 공지사항 저장하기
+        // 일정 저장하기
         calendarRepository.save(pEntity);
 
         log.info(this.getClass().getName() + ".InsertCalendarInfo End!");
