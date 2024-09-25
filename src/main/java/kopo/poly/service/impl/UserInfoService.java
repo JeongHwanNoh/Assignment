@@ -1,13 +1,19 @@
 package kopo.poly.service.impl;
 
+import aj.org.objectweb.asm.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import kopo.poly.auth.AuthInfo;
 import kopo.poly.dto.CalendarDTO;
 import kopo.poly.dto.MailDTO;
 import kopo.poly.dto.UserInfoDTO;
+import kopo.poly.dto.UserInterestsDTO;
 import kopo.poly.repository.UserInfoRepository;
+import kopo.poly.repository.UserInterestsRepository;
 import kopo.poly.repository.entity.CalendarEntity;
 import kopo.poly.repository.entity.NoticeEntity;
 import kopo.poly.repository.entity.UserInfoEntity;
+import kopo.poly.repository.entity.UserInterestsEntity;
 import kopo.poly.service.IMailService;
 import kopo.poly.service.IUserInfoService;
 import kopo.poly.util.CmmUtil;
@@ -15,12 +21,15 @@ import kopo.poly.util.DateUtil;
 import kopo.poly.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -30,6 +39,8 @@ import java.util.stream.Collectors;
 public class UserInfoService implements IUserInfoService {
 
     private final UserInfoRepository userInfoRepository;
+
+    private final UserInterestsRepository userInterestsRepository;
 
     private final MailService mailService;
 
@@ -75,22 +86,20 @@ public class UserInfoService implements IUserInfoService {
 
         log.info(this.getClass().getName() + ".getUserIdExists Start!");
 
-        UserInfoDTO rDTO;
+        AtomicReference<UserInfoDTO> atomicReference = new AtomicReference<>(); // 람다로 인해 값을 공유하지 못하여 AtomicReference 사용함
 
-        String userId = CmmUtil.nvl(pDTO.userId());
+        // ifPresentOrElse 값이 존재할 떄와 값이 존재 안할 때, 수행할 내용을 정의(람다 표현식 사용)
+        userInfoRepository.findByUserId(pDTO.userId()).ifPresentOrElse(entity -> {
+            atomicReference.set(UserInfoDTO.builder().existsYn("Y").build()); // 객체에 값이 존재한다면...
 
-        log.info("userId : " + userId);
+        }, () -> {
+            atomicReference.set(UserInfoDTO.builder().existsYn("N").build()); // 값이 존재하지 않는다면...
 
-        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+        });
 
-        if (rEntity.isPresent()) {
-            rDTO = UserInfoDTO.builder().existsYn("Y").build();
-        } else {
-            rDTO = UserInfoDTO.builder().existsYn("N").build();
-        }
         log.info(this.getClass().getName() + ".getUserIdExist End!");
 
-        return rDTO;
+        return atomicReference.get();
     }
 
 
@@ -155,34 +164,24 @@ public class UserInfoService implements IUserInfoService {
 
         int res = 0;
 
-        String userId = CmmUtil.nvl(pDTO.userId());
-        String userName = CmmUtil.nvl(pDTO.userName());
-        String password = CmmUtil.nvl(pDTO.password());
-        String email = CmmUtil.nvl(pDTO.email());
-        String addr1 = CmmUtil.nvl(pDTO.addr1());
-        String addr2 = CmmUtil.nvl(pDTO.addr2());
-        String genre = CmmUtil.nvl(pDTO.genre());
-
         log.info("pDTO : " + pDTO);
 
-        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+        // 회원 가입 중복 방지를 위해 DB에서 데이터 조회
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(pDTO.userId());
+        Optional<UserInfoEntity> emailCheckEntity = userInfoRepository.findByEmail(pDTO.email());
 
         if (rEntity.isPresent()) {
             res = 2;
+        } else if (emailCheckEntity.isPresent()) {
+            res = 3;
         } else {
-            UserInfoEntity pEntity = UserInfoEntity.builder()
-                    .userId(userId).userName(userName)
-                    .password(password)
-                    .email(email)
-                    .addr1(addr1).addr2(addr2)
-                    .regId(userId).regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
-                    .chgId(userId).chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
-                    .genre(genre)
-                    .build();
 
+            UserInfoEntity pEntity = UserInfoDTO.of(pDTO);
+
+            // 회원정보 DB에 저장
             userInfoRepository.save(pEntity);
 
-            rEntity = userInfoRepository.findByUserId(userId);
+            rEntity = userInfoRepository.findByUserId(pDTO.userId());
 
             if (rEntity.isPresent()) {
                 res = 1;
@@ -190,8 +189,8 @@ public class UserInfoService implements IUserInfoService {
                 res = 0;
             }
         }
-        log.info(this.getClass().getName() + ".insertUserInfo End!");
 
+        log.info(this.getClass().getName() + ".insertUserInfo End!");
         return res;
     }
 
@@ -371,6 +370,60 @@ public class UserInfoService implements IUserInfoService {
         log.info(this.getClass().getName() + ".updateUserInfo End!");
     }
 
+    @Override
+    @Transactional
+    public void saveKeywordsForUser(String userId, List<String> keywords) throws Exception {
+        log.info(this.getClass().getName() + ".saveKeywordsForUser Start!");
+
+        for (String keyword : keywords) {
+            UserInterestsEntity uEntity = UserInterestsEntity.builder()
+                    .userId(userId)
+                    .keyword(keyword)
+                    .build();
+
+            userInterestsRepository.save(uEntity);
+        }
+
+        log.info(this.getClass().getName() + ".saveKeywordsForUser End!");
+    }
+
+    @Override
+    public List<UserInterestsDTO> getKeywordList(String userId) throws Exception {
+
+        log.info(this.getClass().getName() + ".getKeywordList Start!");
+
+        List<UserInterestsEntity> rEntity = userInterestsRepository.findByUserId(userId);
+
+        List<UserInterestsDTO> rList = new ObjectMapper().convertValue(rEntity,
+                new TypeReference<List<UserInterestsDTO>>() {
+                });
+
+        log.info(this.getClass().getName() + ".getKeywordList End!");
+
+        return rList;
+    }
+
+    @Override
+    @Transactional
+    public void updateKeywords(String userId, List<String> keywords) throws Exception {
+        log.info(this.getClass().getName() + ".updateKeywordsForUser Start!");
+
+        // 기존 키워드 삭제
+        userInterestsRepository.deleteByUserId(userId);
+
+        // 새 키워드 추가
+        List<UserInterestsEntity> newInterests = keywords.stream()
+                .map(keyword -> UserInterestsEntity.builder()
+                        .userId(userId)
+                        .keyword(keyword)
+                        .build())
+                .collect(Collectors.toList());
+
+        userInterestsRepository.saveAll(newInterests);
+
+        log.info(this.getClass().getName() + ".updateKeywordsForUser End!");
+    }
+
 
     @Override
     public void updateUserInfo(UserInfoDTO pDTO) throws Exception {
@@ -433,5 +486,28 @@ public class UserInfoService implements IUserInfoService {
 
         log.info(this.getClass().getName() + ".deleteUserInfo End!");
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        log.info(this.getClass().getName() + ".loadUserByUsername Start!");
+
+        log.info("userId : " + userId);
+
+        // 로그인 요청한 사용자 아이디를 검색함
+        // SELECT * FROM USER_INFO WHERE USER_ID = 'hglee67'
+        UserInfoEntity rEntity = userInfoRepository.findByUserId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException(userId + " Not Found User"));
+
+        // rEntity 데이터를 DTO로 변환하기
+        UserInfoDTO rDTO = null;
+        try {
+            rDTO = UserInfoDTO.from(rEntity);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // 비밀번호가 맞는지 체크 및 권한 부여를 위해 rDTO를 UserDetails를 구현한 AuthInfo에 넣어주기
+        return new AuthInfo(rDTO);
     }
 }

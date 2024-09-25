@@ -17,7 +17,7 @@ public class LikeController {
     @ResponseBody
     public String toggleLike(@RequestBody LikeDTO likeDTO) {
         boolean isLiked = likeService.toggleLike(likeDTO.getNoticeSeq(), likeDTO.getUserId());
-        return isLiked ? "좋아요 처리 완료" : "좋아요 취소 완료";
+        return isLiked ? "좋아요 체크 완료" : "좋아요 취소 완료";
     }
 
     @GetMapping("/count")
