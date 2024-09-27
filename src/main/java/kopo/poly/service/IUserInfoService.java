@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface IUserInfoService extends UserDetailsService{
 
+    UserInfoDTO getUserInfo(String userId) throws Exception;
+
     List<UserInfoDTO> getUserList(String userId);
     UserInfoDTO getUserIdExists(UserInfoDTO pDTO) throws Exception;
 

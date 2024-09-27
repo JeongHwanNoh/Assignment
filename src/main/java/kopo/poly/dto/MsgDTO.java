@@ -1,12 +1,12 @@
 package kopo.poly.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
-import lombok.Setter;
 
 @Builder
-public record MsgDTO(
-        int result, // 성공 : 1 / 실패 : 그 외
-        String msg // 메시지
-
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+public record MsgDTO(int result // 결과 코드
+        , String msg // 결과 메시지
 ) {
+
 }

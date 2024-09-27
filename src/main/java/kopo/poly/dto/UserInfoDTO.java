@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Size;
 import kopo.poly.repository.entity.UserInfoEntity;
 import kopo.poly.util.CmmUtil;
+import kopo.poly.util.DateUtil;
 import kopo.poly.util.EncryptUtil;
 import lombok.Builder;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +22,6 @@ public record UserInfoDTO(
         @NotBlank(message = "비밀번호는 필수 입력 사항입니다.")
         @Size(max = 16, message = "비밀번호는 16글자까지 입력가능합니다.")
         String password, // 비밀번호
-        String nickName,
         @NotBlank(message = "이메일은 필수 입력 사항입니다.")
         @Size(max = 30, message = "이메일은 30글자까지 입력가능합니다.")
         String email,
@@ -41,7 +41,7 @@ public record UserInfoDTO(
         /**
          * 패스워드, 권한 등 회원 가입을 위한 정보 만들기
          */
-        public static UserInfoDTO createUser(UserInfoDTO pDTO, String password, String imageUrl) throws Exception {
+        public static UserInfoDTO createUser(UserInfoDTO pDTO, String password) throws Exception {
 
                 UserInfoDTO rDTO = UserInfoDTO.builder()
                         .userId(pDTO.userId())
@@ -52,7 +52,9 @@ public record UserInfoDTO(
                         .chgId(pDTO.userId())
                         .addr1(pDTO.addr1())
                         .addr2(pDTO.addr2())
+                        .regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                         .genre(pDTO.genre())
+                        .chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                         .build();
 
                 return rDTO;

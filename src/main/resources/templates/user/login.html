@@ -43,16 +43,16 @@
 
         // Ajax 호출해서 로그인하기
         $.ajax({
-          url: "/user/loginProc",
+          url: "/login/v1/loginProc",
           type: "post",
           dataType: "JSON",
           data: f.serialize(), // 폼 직렬화하여 전송
           success: function (json) {
-            if (json.result === 1) {
-              alert(json.msg);
+            if (json.data.result === 1) {
+              alert(json.data.msg);
               location.href = "/main/index";
             } else {
-              alert(json.msg);
+              alert(json.data.msg);
               f.find("#user_id").focus();
             }
           }
@@ -73,6 +73,31 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
   <style>
+
+    /* 구글 로그인 버튼 스타일 */
+    .google-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      color: #395072;
+      font-size: 16px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .google-btn img {
+      background-color: white;
+      margin-right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+    }
+
+    .google-btn:hover {
+      color: #2b3c56;
+    }
+
     .bd-placeholder-img {
       font-size: 1.125rem;
       text-anchor: middle;
@@ -110,7 +135,7 @@
     <h1 class="h3 mb-3 fw-normal">로그인</h1>
 
     <div class="form-floating">
-      <input type="user_id" class="form-control" name="user_id" id="user_id" placeholder="&#xf007; 아이디">
+      <input type="text" class="form-control" name="userId" id="userId" placeholder="&#xf007; 아이디">
     </div>
     <label></label>
     <div class="form-floating">
@@ -125,6 +150,10 @@
     <a href="/user/findId">아이디 찾기</a>
     <a href="/user/passwordsearch">비밀번호 찾기</a>
     <a href="/user/userRegForm">회원가입</a>
+    <br><br>
+    <a href="/oauth2/authorization/google" class="google-btn">
+      <img src="/assets/google.png" alt="Google Logo">구글 계정으로 로그인
+    </a>
   </div>
 </main>
 

@@ -1,8 +1,34 @@
 package kopo.poly.service.impl;
 
-import aj.org.objectweb.asm.TypeReference;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
+import kopo.poly.auth.AuthInfo;
+import kopo.poly.dto.*;
+import kopo.poly.repository.UserInfoRepository;
+import kopo.poly.repository.UserInterestsRepository;
+import kopo.poly.repository.entity.UserInfoEntity;
+import kopo.poly.repository.entity.UserInterestsEntity;
+import kopo.poly.service.IMailService;
+import kopo.poly.service.IUserInfoService;
+import kopo.poly.util.CmmUtil;
+import kopo.poly.util.DateUtil;
+import kopo.poly.util.EncryptUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+//import jakarta.transaction.Transactional;
 import kopo.poly.auth.AuthInfo;
 import kopo.poly.dto.CalendarDTO;
 import kopo.poly.dto.MailDTO;
@@ -44,6 +70,18 @@ public class UserInfoService implements IUserInfoService {
 
     private final MailService mailService;
 
+    @Override
+    public UserInfoDTO getUserInfo(String userId) throws Exception {
+
+        log.info(this.getClass().getName() + "getUserInfo Start!");
+
+        // SELECT * FROM USER_INFO WHERE USER_ID = 'hglee67' 쿼리 실행과 동일
+        UserInfoDTO rDTO = UserInfoDTO.from(userInfoRepository.findByUserId(userId).orElseThrow());
+
+        log.info(this.getClass().getName() + "getUserInfo End!");
+
+        return rDTO;
+    }
 
     @Override
     public List<UserInfoDTO> getUserList(String userId) {
@@ -159,38 +197,34 @@ public class UserInfoService implements IUserInfoService {
 
     //회원가입
     @Override
-    public int insertUserInfo(UserInfoDTO pDTO) throws Exception {
-        log.info(this.getClass().getName() + ".insertUserInfo start!");
+    public int insertUserInfo(UserInfoDTO pDTO) {
 
-        int res = 0;
+        log.info(this.getClass().getName() + ".insertUserInfo Start!");
+
+        int res = 0; // 회원가입 성공 : 1, 아이디 중복으로인한 가입 취소 : 2, 기타 에러 발생 : 0
 
         log.info("pDTO : " + pDTO);
 
         // 회원 가입 중복 방지를 위해 DB에서 데이터 조회
         Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(pDTO.userId());
-        Optional<UserInfoEntity> emailCheckEntity = userInfoRepository.findByEmail(pDTO.email());
 
+        // 값이 존재한다면... (이미 회원가입된 아이디)
         if (rEntity.isPresent()) {
             res = 2;
-        } else if (emailCheckEntity.isPresent()) {
-            res = 3;
-        } else {
 
+        } else {
+            // 회원가입을 위한 Entity 생성
             UserInfoEntity pEntity = UserInfoDTO.of(pDTO);
 
             // 회원정보 DB에 저장
             userInfoRepository.save(pEntity);
 
-            rEntity = userInfoRepository.findByUserId(pDTO.userId());
+            res = 1;
 
-            if (rEntity.isPresent()) {
-                res = 1;
-            } else {
-                res = 0;
-            }
         }
 
         log.info(this.getClass().getName() + ".insertUserInfo End!");
+
         return res;
     }
 
@@ -491,11 +525,13 @@ public class UserInfoService implements IUserInfoService {
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         log.info(this.getClass().getName() + ".loadUserByUsername Start!");
+        log.info("userId received: " + userId); // 여기에 로그 추가
 
-        log.info("userId : " + userId);
+        if (userId == null) {
+            throw new UsernameNotFoundException("UserId is null");
+        }
 
         // 로그인 요청한 사용자 아이디를 검색함
-        // SELECT * FROM USER_INFO WHERE USER_ID = 'hglee67'
         UserInfoEntity rEntity = userInfoRepository.findByUserId(userId)
                 .orElseThrow(() -> new UsernameNotFoundException(userId + " Not Found User"));
 
@@ -507,7 +543,7 @@ public class UserInfoService implements IUserInfoService {
             throw new RuntimeException(e);
         }
 
-        // 비밀번호가 맞는지 체크 및 권한 부여를 위해 rDTO를 UserDetails를 구현한 AuthInfo에 넣어주기
         return new AuthInfo(rDTO);
     }
+
 }

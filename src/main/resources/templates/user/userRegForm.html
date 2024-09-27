@@ -167,6 +167,7 @@
 </div>
 
 <script>
+
     $(document).ready(function () {
         $("#btnUserId").on("click", function () {
             userIdExists();
@@ -198,12 +199,13 @@
         }
 
         $.ajax({
-            url: "/user/getUserIdExists",
+            url: "/reg/v1/getUserIdExists",
             type: "post",
-            dataType: "JSON",
-            data: {userId: userId},
+            dataType: "json",
+            contentType: "application/json", // JSON 형식으로 전송
+            data: JSON.stringify({ userId: userId }), // JSON 문자열로 변환
             success: function (json) {
-                if (json.existsYn === "Y") {
+                if (json.data.existsYn === "Y") {
                     alert("이미 가입된 아이디가 존재합니다.");
                 } else {
                     alert("가입 가능한 아이디입니다.");
@@ -268,30 +270,43 @@
             return;
         }
 
-        // 폼 데이터 확인용
-        const formData = $("#registration-form").serialize();
-        console.log(formData); // 폼 데이터가 올바르게 직렬화되었는지 확인
+        // 폼 데이터 객체 생성, authNumber와 mailNumber는 제외
+        let formData = {
+            userId: $("input[name='userId']").val(),
+            userName: $("input[name='userName']").val(),
+            password: $("input[name='password']").val(),
+            email: email,
+            addr1: $("input[name='addr1']").val(),
+            addr2: $("input[name='addr2']").val(),
+            genre: $("input[name='genre']").val()
+        };
+
+        console.log(formData); // 폼 데이터가 올바르게 생성되었는지 확인
 
         // 이메일 인증이 성공한 경우에만 회원가입 요청을 서버에 보냄
         $.ajax({
-            url: "/user/insertUserInfo",
+            url: "/reg/v1/insertUserInfo",
             type: "post",
             dataType: "JSON",
-            data: formData,
+            contentType: "application/json", // JSON 데이터 전송
+            data: JSON.stringify(formData), // formData를 JSON 문자열로 변환하여 전송
             success: function (json) {
-                if (json.result === 1) {
-                    alert(json.msg);
+                if (json.data.result === 1) {
+                    alert(json.data.msg);
                     location.href = "/user/login";
                 } else {
                     alert(json.msg);
                 }
-            }
+            },
         });
+
+
     }
+
+
 </script>
 
 
 </body>
 
 </html>
-
