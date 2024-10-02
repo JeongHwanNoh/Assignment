@@ -62,23 +62,6 @@ public class UserInfoController {
         return "user/userRegForm";
     }
 
-//    @ResponseBody
-//    @PostMapping(value = "getUserIdExists")
-//    public UserInfoDTO getUserIdExists(HttpServletRequest request) throws Exception {
-//        log.info(this.getClass().getName() + ".getuserIdExist Start!");
-//        String userId = CmmUtil.nvl(request.getParameter("userId"));
-//        log.info("userId : " + userId);
-//
-//        UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
-//
-//        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserIdExists(pDTO))
-//                .orElseGet(() -> UserInfoDTO.builder().build());
-//
-//        log.info(this.getClass().getName() + ".getUserIdExists Emd!");
-//
-//        return rDTO;
-//    }
-
     @ResponseBody
     @PostMapping(value = "getEmailExists")
     public UserInfoDTO getEmailExists(HttpServletRequest request) throws Exception {
@@ -98,62 +81,6 @@ public class UserInfoController {
 
         return rDTO;
     }
-//    @ResponseBody
-//    @PostMapping(value = "insertUserInfo")
-//    public MsgDTO insertUserInfo(HttpServletRequest request) throws Exception {
-//        log.info(this.getClass().getName() + ".insertUserInfo start!");
-//
-//        String msg;
-//
-//        String userId = CmmUtil.nvl(request.getParameter("userId"));
-//        String userName = CmmUtil.nvl(request.getParameter("userName"));
-//        String password = CmmUtil.nvl(request.getParameter("password"));
-//        String email = CmmUtil.nvl(request.getParameter("email"));
-//        String addr1 = CmmUtil.nvl(request.getParameter("addr1"));
-//        String addr2 = CmmUtil.nvl(request.getParameter("addr2"));
-//        String genre = CmmUtil.nvl(request.getParameter("genre"));
-//
-//        log.info("userId : " + userId);
-//        log.info("userName : " + userName);
-//        log.info("password : " + password);
-//        log.info("email : " + email);
-//        log.info("addr1 : " + addr1);
-//        log.info("addr2 : " + addr2);
-//        log.info("genre : " + genre);
-//
-//
-//        UserInfoDTO pDTO = UserInfoDTO.builder()
-//                .userId(userId)
-//                .userName(userName)
-//                .password(EncryptUtil.encHashSHA256(password))
-//                .email(EncryptUtil.encAES128CBC(email))
-//                .addr1(addr1)
-//                .addr1(addr1)
-//                .addr2(addr2)
-//                .regId(userId)
-//                .chgId(userId)
-//                .genre(genre)
-//                .build();
-//
-//        int res = userInfoService.insertUserInfo(pDTO);
-//
-//        log.info("회원가입 결과(res) " + res);
-//
-//        if (res == 1) {
-//            msg = "회원가입되었습니다.";
-//        } else if (res == 2) {
-//            msg = "이미 가입된 아이디입니다.";
-//
-//        } else {
-//            msg = "오류로 인해 회원가입이 실패하였습니다.";
-//        }
-//
-//        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
-//
-//        log.info(this.getClass().getName() + ".insertUserInfo End");
-//
-//        return dto;
-//    }
     @GetMapping(value = "login")
     public String login() {
         log.info(this.getClass().getName() + ".user/login start");
@@ -161,24 +88,6 @@ public class UserInfoController {
 
         return "user/login";
     }
-    @ResponseBody
-    @PostMapping(value = "logout")
-    public MsgDTO logout(HttpSession session) {
-        log.info(this.getClass().getName() + ".logout Start!");
-
-        session.setAttribute("SS_USER_ID", "");
-        session.removeAttribute("SS_USER_ID");
-
-        MsgDTO dto = MsgDTO.builder()
-                .result(1)
-                .msg("로그아웃하였습니다.")
-                .build();
-
-        log.info(this.getClass().getName() + ".logout End!");
-
-        return dto;
-    }
-
     @GetMapping(value = "findId")
     public String searchUserId() {
         log.info(this.getClass().getName() + ".user/searchUserId Start!");

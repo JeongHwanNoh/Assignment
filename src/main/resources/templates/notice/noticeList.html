@@ -149,21 +149,6 @@
             });
 
             // 로그아웃 함수
-            function logOut() {
-                $.ajax({
-                    url: "/user/logout",
-                    type: "post", // 전송방식은 Post
-                    dataType: "JSON", // 전송 결과는 JSON으로 받기
-                    success: function (json) {
-                        if (json.result === 1) { // 로그아웃 성공
-                            alert(json.msg); // 메시지 띄우기
-                            location.href = "/main/index"; // 메인화면으로 이동
-                        } else { // 로그인 실패
-                            alert(json.msg); // 메시지 띄우기
-                        }
-                    }
-                })
-            }
 
             // 페이지 로드 시 버튼 표시 여부 설정
             displayButtons(isLoggedIn);
@@ -210,7 +195,7 @@
                     <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/mypage">마이페이지</a></li>
                     <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
                     <li class="nav-item"><a id="reButton" class="nav-link" href="/user/userRegForm">회원가입</a></li>
-                    <li class="nav-item"><a id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
+                    <li class="nav-item"><a href="/user/logout" id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
                 </ul>
             </div>
         </div>
