@@ -6,7 +6,6 @@ import lombok.Builder;
 public record BookDTO(
 
         Long bookSeq,
-
         String userId,
         String title,
         String author,

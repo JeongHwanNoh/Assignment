@@ -13,4 +13,5 @@ public interface IWeatherFeign {
             @Param("lang") String lang,
             @Param("units") String units
     );
+
 }

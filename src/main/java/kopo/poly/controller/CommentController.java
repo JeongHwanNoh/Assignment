@@ -35,6 +35,7 @@ public class CommentController {
 
         MsgDTO dto; // 결과 메시지 구조
 
+
         try {
             // 로그인된 사용자 아이디를 가져오기
             // 로그인을 아직 구현하지 않았기에 공지사항 리스트에서 로그인 한 것처럼 Session 값을 저장함

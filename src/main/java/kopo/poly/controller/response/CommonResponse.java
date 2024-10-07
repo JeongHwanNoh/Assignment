@@ -15,6 +15,7 @@ public class CommonResponse<T> {
     private String message;
     private T data;
 
+
     @Builder
     public CommonResponse(HttpStatus httpStatus, String message, T data) {
         this.httpStatus = httpStatus;

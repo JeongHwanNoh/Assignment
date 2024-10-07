@@ -33,4 +33,5 @@ public class UserInterestsEntity {
     @Column(name = "reg_dt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private String regDt;
 
+
 }

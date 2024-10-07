@@ -14,4 +14,5 @@ public class LikeDTO {
     private Long likeSeq;  // 좋아요 시퀀스 ID
     private Long noticeSeq;  // 게시물 시퀀스 ID
     private String userId;   // 사용자 ID
+
 }

@@ -43,5 +43,6 @@ public class CalendarEntity implements Serializable {
     @NonNull
     @Column(name = "description", length = 2000, nullable = false)
     private String description;
+
 }
 

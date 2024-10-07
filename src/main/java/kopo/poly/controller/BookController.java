@@ -36,6 +36,7 @@ public class BookController {
         List<BookDTO> rList = Optional.ofNullable(bookService.getBookList(userId))
                 .orElseGet(ArrayList::new);
 
+
         model.addAttribute("SS_USER_ID", userId);
         model.addAttribute("rList", rList);
 

@@ -52,4 +52,5 @@ public class NoticeEntity {
     @Column(name = "chg_dt")
     private String chgDt;
 
+
 }

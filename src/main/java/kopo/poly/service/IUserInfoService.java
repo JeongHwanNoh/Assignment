@@ -51,4 +51,5 @@ public interface IUserInfoService extends UserDetailsService{
 
     void updateUserInfo(UserInfoDTO pDTO) throws Exception;
     void deleteUserInfo(UserInfoDTO pDTO) throws Exception;
+
 }

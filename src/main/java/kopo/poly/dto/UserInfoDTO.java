@@ -16,7 +16,6 @@ import java.io.Serializable;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserInfoDTO(
-
         String userId,
         String userName,
         @NotBlank(message = "비밀번호는 필수 입력 사항입니다.")

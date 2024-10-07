@@ -39,4 +39,5 @@ public class CommentEntity {
     @Column(name = "chg_dt")
     private String chgDt;
 
+
 }

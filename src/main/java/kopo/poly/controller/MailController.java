@@ -36,6 +36,7 @@ public class MailController {
         log.info(this.getClass().getName() + "mailForm Start!");
 
         return "mail/mailForm";
+
     }
 
     /**

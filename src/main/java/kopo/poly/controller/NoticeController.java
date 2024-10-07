@@ -69,7 +69,6 @@ public class NoticeController {
         // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
         // templates/notice/noticeList.html
         return "notice/noticeList";
-
     }
 
     /**

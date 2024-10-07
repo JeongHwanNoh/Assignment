@@ -10,5 +10,6 @@ public interface IWeatherService {
 
     WeatherDTO getWeather(String city, String apiKey) throws Exception;
 
+
 }
 

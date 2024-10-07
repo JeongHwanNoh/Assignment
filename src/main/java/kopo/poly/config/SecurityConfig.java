@@ -88,6 +88,7 @@ public class SecurityConfig {
         };
     }
 
+
     @Bean
     public LogoutSuccessHandler oidcLogoutSuccessHandler() {
         OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =

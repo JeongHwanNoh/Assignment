@@ -54,5 +54,6 @@ public class WeatherService implements IWeatherService {
                 .windSpeed(windSpeed)
                 .icon(icon)
                 .build();
+
     }
 }

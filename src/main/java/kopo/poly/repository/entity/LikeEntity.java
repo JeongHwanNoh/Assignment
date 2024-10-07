@@ -25,6 +25,7 @@ public class LikeEntity {
     @Column(name = "notice_seq", nullable = false)
     private Long noticeSeq;
 
+
     @NonNull
     @Column(name = "user_id", nullable = false)
     private String userId;

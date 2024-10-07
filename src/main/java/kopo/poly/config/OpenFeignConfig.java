@@ -44,7 +44,7 @@ public class OpenFeignConfig {
     @Value("${weather.api.key}")
     private String weatherkey;
 
-    // API 접속을 위해 접속 방법은 기본 값으로 설정함(반드시 설정되어야 함)
+    // API 접속을 위해 접속 방법은 기본 값으로 설정함(반드시 설정되어야 함.)
     @Bean
     public Contract feignContract() {
         return new Contract.Default();

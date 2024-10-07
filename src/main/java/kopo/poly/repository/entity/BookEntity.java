@@ -16,6 +16,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 
 public class BookEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_seq")

@@ -15,5 +15,6 @@ public record ReviewDTO(
         String contents,
         String regDt,
         String imageUrl
+
 ) {
 }

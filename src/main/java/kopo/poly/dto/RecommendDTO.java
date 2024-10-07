@@ -11,7 +11,6 @@ public record RecommendDTO(
         String title,
         String author,
         String image,
-
         String isbn
 
 ) implements Serializable {

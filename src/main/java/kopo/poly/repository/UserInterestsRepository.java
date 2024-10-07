@@ -23,4 +23,5 @@ public interface UserInterestsRepository extends JpaRepository<UserInterestsEnti
      */
     void deleteByUserId(String userId);
 
+
 }

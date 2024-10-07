@@ -96,6 +96,7 @@ public class IndexController {
 
     @GetMapping(value = "index")
     public String mainIndex(HttpSession session, ModelMap model) {
+
         WeatherDTO weather = null; // 날씨 정보를 초기화합니다.
 
         try {

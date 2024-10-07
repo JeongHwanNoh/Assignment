@@ -11,6 +11,7 @@ public record CommentDTO(
         String userId, // 작성자
         String regDt, // 등록일
         String chgDt
+
 ) {
 
 }

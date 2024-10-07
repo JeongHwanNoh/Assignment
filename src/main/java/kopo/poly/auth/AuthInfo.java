@@ -20,9 +20,6 @@ public class AuthInfo implements UserDetails {
     // UserInfoRepository로부터 조회된 정보를 저장하기 위한 객체
     private final UserInfoDTO userInfoDTO;
 
-    /**
-     * 로그인한 사용자의 권한 부여하기
-     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

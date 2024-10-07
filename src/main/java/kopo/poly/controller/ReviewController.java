@@ -28,6 +28,7 @@ public class ReviewController {
 
     private final IBookService bookService;
 
+
     @GetMapping("/searchpop")
     public String searchpop(@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword, Model model, HttpSession session) {
         log.info(this.getClass().getName() + ".searchBook start");

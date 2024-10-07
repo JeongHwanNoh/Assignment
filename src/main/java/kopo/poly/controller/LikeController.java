@@ -20,6 +20,7 @@ public class LikeController {
         return isLiked ? "좋아요 체크 완료" : "좋아요 취소 완료";
     }
 
+
     @GetMapping("/count")
     @ResponseBody
     public Long getLikeCount(@RequestParam Long noticeSeq) {

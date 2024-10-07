@@ -8,6 +8,7 @@ public record UserInterestsDTO(
         String userId,
         String keyword,
         String regDt
+
 ) {
 
 }

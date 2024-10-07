@@ -506,6 +506,7 @@ public class UserInfoController {
             // 결과 메시지 전달하기
             dto = MsgDTO.builder().msg(msg).build();
 
+
             log.info(this.getClass().getName() + ".userUpdate End!");
 
         }

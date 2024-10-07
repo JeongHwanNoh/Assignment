@@ -14,7 +14,6 @@ public record WeatherDTO(
         double feelsLike,
         int humidity,
         double windSpeed,
-
         String icon
 ) {
 }
