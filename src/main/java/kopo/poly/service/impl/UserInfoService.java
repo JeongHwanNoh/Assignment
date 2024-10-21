@@ -68,6 +68,8 @@ public class UserInfoService implements IUserInfoService {
 
     private final UserInterestsRepository userInterestsRepository;
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+
     private final MailService mailService;
 
     @Override
@@ -105,6 +107,7 @@ public class UserInfoService implements IUserInfoService {
                                 .userName(userInfoEntity.getUserName())
                                 .email(decryptedEmail) // 복호화된 이메일 설정
                                 .genre(userInfoEntity.getGenre())
+                                .provider(userInfoEntity.getProvider())
                                 .build();
                     } catch (Exception e) {
                         log.error("Error decrypting email for user: {}", userId, e);
@@ -508,19 +511,37 @@ public class UserInfoService implements IUserInfoService {
 
     @Override
     public void deleteUserInfo(UserInfoDTO pDTO) throws Exception {
-
         log.info(this.getClass().getName() + ".deleteUserInfo Start!");
 
         String userId = pDTO.userId();
-
         log.info("userId : " + userId);
 
+        // 데이터베이스에서 사용자 정보를 조회
+        Optional<UserInfoEntity> userEntityOptional = userInfoRepository.findByUserId(userId);
+
+        if (userEntityOptional.isPresent()) {
+
+            UserInfoEntity userEntity = userEntityOptional.get();
+
+            String provider = userEntity.getProvider();
+
+            String accessToken = userEntity.getAccessToken();
+
+            if (provider != null) {
+                // 액세스 토큰 취소
+                customOAuth2UserService.revokeAccessToken(accessToken);
+                log.info("Access Token for user {} has been revoked.", userId);
+            } else {
+                log.warn("No user found with userId: {}", userId);
+            }
+        }
+
+        // 사용자 정보 삭제
         userInfoRepository.deleteById(userId);
 
-
         log.info(this.getClass().getName() + ".deleteUserInfo End!");
-
     }
+
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {

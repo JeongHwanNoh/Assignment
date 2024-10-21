@@ -26,7 +26,6 @@ public class UserInfoEntity implements Serializable {
     @Column(name = "USER_NAME", length = 100, nullable = false)
     private String userName;
 
-    @NonNull
     @Column(name = "PASSWORD", length = 100, nullable = false)
     private String password;
 
@@ -34,11 +33,9 @@ public class UserInfoEntity implements Serializable {
     @Column(name = "EMAIL", nullable = false)
     private String email;
 
-    @NonNull
     @Column(name = "ADDR1", nullable = false)
     private String addr1;
 
-    @NonNull
     @Column(name = "ADDR2", nullable = false)
     private String addr2;
 
@@ -46,7 +43,6 @@ public class UserInfoEntity implements Serializable {
     @Column(name = "REG_ID", updatable = false)
     private String regId;
 
-    @NonNull
     @Column(name = "REG_DT", updatable = false)
     private String regDt;
 
@@ -55,6 +51,12 @@ public class UserInfoEntity implements Serializable {
 
     @Column(name = "CHG_DT")
     private String chgDt;
+
+    @Column(name = "ACCESS_TOKEN")
+    private String accessToken;
+
+    @Column(name = "PROVIDER")
+    private String provider;
 
     @Column(name = "GENRE", length = 100, nullable = false)
     private String genre;

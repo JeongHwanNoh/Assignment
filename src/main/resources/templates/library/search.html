@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -86,7 +86,8 @@
                     <li class="nav-item"><a id="loginButton" class="nav-link" href="/user/login">로그인</a></li>
                     <li class="nav-item"><a id="reButton" class="nav-link" href="/user/userRegForm">회원가입</a></li>
                     <li class="nav-item"><a id="mypageButton" class="nav-link" href="/user/mypage">마이페이지</a></li>
-                    <li class="nav-item"><a href="/user/logout" id="btnLogout" class="nav-link" type="button">로그아웃</a></li>
+                    <li class="nav-item"><a href="/user/logout" id="btnLogout" class="nav-link" type="button">로그아웃</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -318,15 +319,15 @@
                     overflow: hidden;
                 }
 
-                 .map-container {
-                     display: flex;
-                     justify-content: center;
-                     align-items: center;
-                     background-color: #f0f8ff;
-                     padding: 20px;
-                     border-radius: 10px;
-                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                 }
+                .map-container {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: #f0f8ff;
+                    padding: 20px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
 
                 .map_wrap {
                     position: relative;
@@ -458,8 +459,21 @@
             </div>
         </div>
 
-        <script type="text/javascript"
-                src="//dapi.kakao.com/v2/maps/sdk.js?appkey=acf29d7c33c4d56732c71461df0c3bea&libraries=services"></script>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const kakaoMapApiKey = /*[[${kakaoMapApiKey}]]*/ 'YOUR_DEFAULT_API_KEY';
+            const src = "//dapi.kakao.com/v2/maps/sdk.js?appkey=" + kakaoMapApiKey + "&libraries=services";
+            /*]]>*/
+
+            // 동적으로 스크립트 태그 생성
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = src;
+
+            // 문서의 head 또는 body에 스크립트 태그 추가
+            document.head.appendChild(script);
+
+        </script>
         <script>
             var markers = [];
             var mapContainer = document.getElementById('map');
@@ -538,6 +552,7 @@
                     alert('검색 결과가 존재하지 않습니다.');
                 }
             }
+
             function displayPlaces(places) {
                 var listEl = document.getElementById('placesList');
                 var menuEl = document.getElementById('menu_wrap');

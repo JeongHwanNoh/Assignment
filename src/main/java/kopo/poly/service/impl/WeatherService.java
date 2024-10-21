@@ -22,8 +22,6 @@ public class WeatherService implements IWeatherService {
 
     @Override
     public WeatherDTO getWeather(String city, String apiKey) throws JsonProcessingException {
-        log.info("city : " + city);
-        log.info("apiKey : " + apiKey);
 
         // API 호출
         String response = weatherFeign.getWeather(city, apiKey, "kr", "metric");

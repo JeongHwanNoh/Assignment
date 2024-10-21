@@ -32,6 +32,10 @@ public record UserInfoDTO(
         String chgDt,
         String existsYn,
         String genre,
+
+        String provider,
+
+        String accessToken,
         int authNumber,
         int mailNumber
 
@@ -51,6 +55,7 @@ public record UserInfoDTO(
                         .chgId(pDTO.userId())
                         .addr1(pDTO.addr1())
                         .addr2(pDTO.addr2())
+                        .accessToken(pDTO.accessToken())
                         .regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
                         .genre(pDTO.genre())
                         .chgDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
@@ -76,6 +81,7 @@ public record UserInfoDTO(
                         .addr1(dto.addr1())
                         .addr2(dto.addr2())
                         .genre(dto.genre())
+                        .accessToken(dto.accessToken())
                         .chgDt(dto.chgDt()).build();
 
                 return entity;
@@ -98,6 +104,7 @@ public record UserInfoDTO(
                         .addr1(entity.getAddr1())
                         .addr2(entity.getAddr2())
                         .genre(entity.getGenre())
+                        .accessToken(entity.getAccessToken())
                         .chgDt(entity.getChgDt()).build();
 
                 return rDTO;
